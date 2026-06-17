@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 
-const ebGaramond = EB_Garamond({subsets:['latin'],variable:'--font-serif'});
+const ebGaramond = EB_Garamond({ subsets: ['latin'], variable: '--font-serif' });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atria — AI Command Center",
+  title: "Locus — AI Command Center",
   description: "AI-powered command center for Gmail and Google Calendar",
 };
 

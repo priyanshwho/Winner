@@ -13,7 +13,7 @@ export default function Dashboard() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground text-background">
               <Star className="h-5 w-5 fill-current" />
             </div>
-            <span className="text-xl font-bold font-serif tracking-tight text-foreground">Atria</span>
+            <span className="text-xl font-bold font-serif tracking-tight text-foreground">Locus</span>
           </div>
 
           <div className="flex items-center gap-3">

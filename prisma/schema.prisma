@@ -8,15 +8,18 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id             String          @id
+  name           String
+  email          String
+  emailVerified  Boolean         @default(false)
+  image          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sessions       Session[]
+  accounts       Account[]
+  conversations  Conversation[]
+  gmailCaches    GmailCache[]
+  calendarEvents CalendarEvent[]
 
   @@unique([email])
   @@map("user")
@@ -69,3 +72,117 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@index([userId])
+  @@map("conversation")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String       // "user" | "assistant" | "system"
+  content        String
+  timestamp      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@map("message")
+}
+
+model GmailCache {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gmailId    String   @unique
+  threadId   String
+  subject    String
+  sender     String
+  snippet    String
+  receivedAt DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([receivedAt])
+  @@map("gmail_messages")
+}
+
+model CalendarEvent {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String   @unique
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  attendees Json     // Array of attendee email strings
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([startTime])
+  @@map("calendar_events")
+}
+
+// Corsair Sync Database Tables
+model CorsairIntegration {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  name      String
+  config    Json     @default("{}")
+  dek       String?
+  accounts  CorsairAccount[]
+
+  @@map("corsair_integrations")
+}
+
+model CorsairAccount {
+  id            String   @id
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  tenantId      String   @map("tenant_id")
+  integrationId String   @map("integration_id")
+  integration   CorsairIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  config        Json     @default("{}")
+  dek           String?
+  entities      CorsairEntity[]
+  events        CorsairEvent[]
+
+  @@map("corsair_accounts")
+}
+
+model CorsairEntity {
+  id         String   @id
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  accountId  String   @map("account_id")
+  account    CorsairAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  entityId   String   @map("entity_id")
+  entityType String   @map("entity_type")
+  version    String
+  data       Json     @default("{}")
+
+  @@map("corsair_entities")
+}
+
+model CorsairEvent {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  accountId String   @map("account_id")
+  account   CorsairAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  eventType String   @map("event_type")
+  payload   Json     @default("{}")
+  status    String?
+
+  @@map("corsair_events")
+}
+

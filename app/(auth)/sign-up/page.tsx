@@ -15,7 +15,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   return (
     <Card className="border-border bg-card shadow-lg sm:rounded-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight font-serif">Atria</CardTitle>
+        <CardTitle className="text-3xl font-bold tracking-tight font-serif">Locus</CardTitle>
         <CardDescription className="text-muted-foreground text-sm">
           Create an account to manage Gmail and Calendar.
         </CardDescription>
