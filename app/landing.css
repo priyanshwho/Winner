@@ -45,7 +45,7 @@
   text-decoration: none;
 }
 
-.landing-page-container img {
+.landing-page-container .preloader-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
