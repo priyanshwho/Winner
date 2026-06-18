@@ -26,6 +26,9 @@ importers:
       '@corsair-dev/mcp':
         specifier: ^0.1.22
         version: 0.1.22(postgres@3.4.7)
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@4.4.3)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
