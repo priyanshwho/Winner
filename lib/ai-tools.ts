@@ -4,7 +4,7 @@ import { buildCorsairToolDefs } from '@corsair-dev/mcp';
 import { corsair } from './corsair';
 
 export function getCorsairAiTools(tenantId: string) {
-  const mcpTools = buildCorsairToolDefs({ corsair, tenantId });
+  const mcpTools = buildCorsairToolDefs({ corsair: corsair.withTenant(tenantId) as any, tenantId });
   const aiTools: Record<string, any> = {};
 
   for (const mcpTool of mcpTools) {
