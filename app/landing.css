@@ -2,8 +2,9 @@
 
 .landing-page-container {
   --base-100: #fff;
-  --base-200: #e0e2db;
-  --base-300: #141414;
+  --base-200: #f5f1eb;
+  --base-300: #0c0a09;
+  --base-accent: #c41e3a;
   
   position: relative;
   width: 100%;
@@ -12,9 +13,16 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.landing-page-container.loaded {
+  height: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .dark .landing-page-container {
-  --base-200: #141414;
-  --base-300: #e0e2db;
+  --base-100: #0c0a09;
+  --base-200: #0c0a09;
+  --base-300: #f5f1eb;
 }
 
 .landing-page-container .hero,
@@ -29,15 +37,27 @@
 }
 
 
-.landing-page-container * {
+.landing-page-container .preloader,
+.landing-page-container .preloader *,
+.landing-page-container .hero,
+.landing-page-container .hero * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-.landing-page-container h1,
-.landing-page-container a,
-.landing-page-container p {
+.landing-page-container {
+  box-sizing: border-box;
+}
+
+.landing-page-container .preloader h1,
+.landing-page-container .preloader a,
+.landing-page-container .preloader p,
+.landing-page-container .hero h1,
+.landing-page-container .hero a,
+.landing-page-container .hero p,
+.landing-page-container .hero-footer p,
+.landing-page-container .header h1 {
   font-family: "PP Neue Montreal", sans-serif;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -136,9 +156,23 @@
   position: relative;
   width: 100%;
   height: 100svh;
-  background-color: var(--base-200);
+  background-image: url('/hero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--base-300);
   overflow: hidden;
+}
+
+.landing-page-container .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--base-200);
+  opacity: 0.50;
+  z-index: 1;
+  pointer-events: none;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
 .landing-page-container .header {
@@ -151,7 +185,7 @@
   width: 100%;
   height: max-content;
   overflow: hidden;
-  z-index: 2;
+  z-index: 3;
 }
 
 .landing-page-container .header h1 {
@@ -168,7 +202,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  z-index: 2;
+  z-index: 3;
 }
 
 .landing-page-container .char,
@@ -189,4 +223,28 @@
     gap: 0;
     text-align: right;
   }
+}
+
+.landing-page-container nav a {
+  transition: color 0.3s ease;
+}
+
+.landing-page-container nav a:hover {
+  color: var(--base-accent);
+}
+
+.landing-page-container .hero-footer p {
+  transition: color 0.3s ease;
+}
+
+.landing-page-container .hero-footer a:hover p {
+  color: var(--base-accent);
+}
+
+.landing-page-container .header h1 {
+  transition: color 0.3s ease;
+}
+
+.landing-page-container .header h1:hover {
+  color: var(--base-accent);
 }

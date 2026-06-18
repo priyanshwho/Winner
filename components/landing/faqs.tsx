@@ -8,24 +8,24 @@ export default function FAQs() {
 
   const faqList = [
     {
-      question: "Who is Alfred AI and how does he help me?",
+      question: "What is Locus and how does it connect to my Workspace?",
       answer:
-        "Alfred AI is your personal training mentor. He reviews your code in real-time, offers strategic hints when you're stuck on hard algorithms, and helps compile weekly progress reports to sharpen your coding skills.",
+        "Locus is an AI-powered command center that securely interfaces with your Gmail and Google Calendar. It syncs messages, digests threads, and maps appointments inside a single dashboard panel.",
     },
     {
-      question: "Do I need a Wayne Enterprises budget to join?",
+      question: "How does the AI Assistant automate my tasks?",
       answer:
-        "No. You can start training on our Free Tier for ₹0/forever. For serious vigilantes preparing for intense technical interviews, the Pro Plan offers full vault access for ₹299/month.",
+        "The integrated AI assistant utilizes advanced models (like Gemini) to interpret your text prompts. It reads synced inbox caches to draft email responses, cross-references availability, and books Google Calendar slots dynamically.",
     },
     {
-      question: "Can I train collaboratively with other vigilantes?",
+      question: "Is my personal email and calendar data secure?",
       answer:
-        "Yes. Real-time collaborative coding lets you group up and tackle challenges with other developers in the Arkham Labs network. Learn together, solve together.",
+        "Absolutely. All service synchronization is handled using secure OAuth tokens. Synced database caches are isolated and encrypted under double-envelope standards using your private environment key (CORSAIR_KEK).",
     },
     {
-      question: "Is my progress tracking data secure?",
+      question: "Do I need a credit card to sign up?",
       answer:
-        "Absolutely. Your solutions, history, and profile details are encrypted using Wayne Enterprises encryption standards (KEK) and stored securely in isolated multi-tenant databases.",
+        "No. You can sign up and get started on our Free Tier without entering any payment credentials. Upgrade to Pro only when you need real-time synchronization and priority AI tools.",
     },
   ];
 
@@ -34,43 +34,43 @@ export default function FAQs() {
   };
 
   return (
-    <section id="faqs" className="py-20 border-t border-zinc-900 bg-zinc-950 text-white relative">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-16">
-          <h2 className="text-3xl font-bold font-serif text-white tracking-tight sm:text-4xl uppercase">
-            FAQs
+    <section id="faqs" className="py-32 md:py-40 border-t border-border bg-background text-foreground relative">
+      <div className="mx-auto max-w-3xl px-6 sm:px-8 lg:px-12">
+        <div className="text-center space-y-5 mb-20 md:mb-24">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-serif text-foreground tracking-tight uppercase leading-tight">
+            Frequently Asked<br className="hidden sm:block" /> Questions
           </h2>
-          <p className="text-sm text-zinc-400 max-w-xl mx-auto font-mono">
-            Alfred Gets These Questions a Lot
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto font-sans leading-relaxed">
+            Got questions? We&apos;ve got answers.
           </p>
         </div>
 
         {/* Accordions */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           {faqList.map((faq, index) => {
             const isOpen = openIdx === index;
             return (
               <div
                 key={index}
-                className="rounded-xl border border-zinc-900 bg-zinc-900/10 overflow-hidden transition-all hover:border-zinc-800"
+                className="rounded-xl border border-border/60 bg-card/25 overflow-hidden transition-all hover:border-border"
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full flex items-center justify-between p-6 text-left transition-colors hover:bg-zinc-900/20"
+                  className="w-full flex items-center justify-between p-7 text-left transition-colors hover:bg-muted/10 cursor-pointer"
                 >
-                  <span className="text-sm font-semibold text-white font-sans uppercase tracking-wide">
+                  <span className="text-sm md:text-base font-semibold text-foreground font-sans uppercase tracking-wide pr-4">
                     {faq.question}
                   </span>
                   {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-[#f59e0b] shrink-0" />
+                    <ChevronUp className="h-5 w-5 text-primary shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-zinc-500 shrink-0" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />
                   )}
                 </button>
                 
                 {isOpen && (
-                  <div className="px-6 pb-6 pt-0 border-t border-zinc-900/50 bg-zinc-900/5">
-                    <p className="text-sm text-zinc-400 leading-relaxed font-sans pt-4">
+                  <div className="px-7 pb-7 pt-0 border-t border-border/40 bg-card/10 animate-in fade-in duration-200">
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-sans pt-5">
                       {faq.answer}
                     </p>
                   </div>

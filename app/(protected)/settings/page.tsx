@@ -95,33 +95,33 @@ export default async function SettingsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans p-6 sm:p-10 flex flex-col items-center">
-      <div className="w-full max-w-4xl space-y-8">
+    <div className="min-h-screen bg-background text-foreground font-sans p-6 sm:p-10 flex flex-col items-center">
+      <div className="w-full max-w-4xl space-y-8 animate-in fade-in">
         
         {/* Top bar with back navigation */}
-        <header className="flex items-center justify-between border-b border-zinc-900 pb-5">
+        <header className="flex items-center justify-between border-b border-border/60 pb-5">
           <div className="flex items-center gap-3">
             <Link href="/dashboard">
               <Button 
                 variant="outline" 
                 size="icon" 
-                className="h-9 w-9 border-zinc-800 bg-zinc-900 text-zinc-350 hover:bg-zinc-800 hover:text-white"
+                className="h-9 w-9 border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <ArrowLeft className="h-4.5 w-4.5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-extrabold font-serif text-white tracking-tight flex items-center gap-3">
-                <Settings className="h-7 w-7 text-zinc-400" />
+              <h1 className="text-3xl font-extrabold font-serif text-foreground tracking-tight flex items-center gap-3">
+                <Settings className="h-7 w-7 text-muted-foreground/80" />
                 Settings & Caches
               </h1>
-              <p className="text-base text-zinc-400 mt-1.5">Configure connection tokens, webhook setups, and track sync records.</p>
+              <p className="text-base text-muted-foreground mt-1.5">Configure connection tokens, webhook setups, and track sync records.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <ModeToggle />
             <Link href="/dashboard">
-              <Button className="bg-zinc-100 text-zinc-950 hover:bg-zinc-200 font-semibold text-sm h-10 px-4 rounded-xl shadow-sm cursor-pointer">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm h-10 px-4 rounded-xl shadow-sm cursor-pointer transition-colors">
                 Back to Workspace
               </Button>
             </Link>
@@ -130,80 +130,80 @@ export default async function SettingsPage() {
 
         {/* Integration Credentials Section */}
         <section className="space-y-4">
-          <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Service Connections</h2>
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Service Connections</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             
             {/* Gmail integration card */}
-            <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md">
+            <Card className="bg-card border-border/80 text-card-foreground shadow-md">
               <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
                 <div className="space-y-1">
-                  <CardTitle className="text-base font-semibold text-white">Gmail Account</CardTitle>
-                  <CardDescription className="text-zinc-500 text-xs">Read and draft messages</CardDescription>
+                  <CardTitle className="text-base font-semibold text-foreground">Gmail Account</CardTitle>
+                  <CardDescription className="text-muted-foreground text-xs">Read and draft messages</CardDescription>
                 </div>
                 <div className="p-2 rounded-xl bg-red-500/10 text-red-400">
                   <Mail className="h-5 w-5" />
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
-                <p className="text-sm text-zinc-350 leading-relaxed min-h-[48px] flex items-center">
+                <p className="text-sm text-foreground/90 leading-relaxed min-h-[48px] flex items-center">
                   Securely connects your Gmail account so the AI assistant can help you search messages, summarize threads, and draft replies.
                 </p>
-                <div className="flex items-center justify-between pt-3 border-t border-zinc-950">
+                <div className="flex items-center justify-between pt-3 border-t border-border/40">
                   {hasGmail ? (
                     <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-3 py-1 rounded-full">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>Connected</span>
                     </div>
                   ) : (
-                    <div className="text-xs text-zinc-500 font-medium">Not connected</div>
+                    <div className="text-xs text-muted-foreground font-medium">Not connected</div>
                   )}
                   
                   {!hasGmail ? (
                     <a href="/api/integrations/gmail/connect">
-                      <Button className="bg-white text-black hover:bg-zinc-200 font-semibold text-xs py-1.5 px-4 rounded-lg cursor-pointer">
+                      <Button className="bg-foreground text-background hover:bg-foreground/90 font-semibold text-xs py-1.5 px-4 rounded-lg cursor-pointer">
                         Connect Gmail
                       </Button>
                     </a>
                   ) : (
-                    <span className="text-xs text-zinc-500 italic">Managed securely</span>
+                    <span className="text-xs text-muted-foreground italic">Managed securely</span>
                   )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Google Calendar integration card */}
-            <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md">
+            <Card className="bg-card border-border/80 text-card-foreground shadow-md">
               <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
                 <div className="space-y-1">
-                  <CardTitle className="text-base font-semibold text-white">Google Calendar</CardTitle>
-                  <CardDescription className="text-zinc-550 text-xs">Schedule and track invites</CardDescription>
+                  <CardTitle className="text-base font-semibold text-foreground">Google Calendar</CardTitle>
+                  <CardDescription className="text-muted-foreground text-xs">Schedule and track invites</CardDescription>
                 </div>
                 <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
                   <Calendar className="h-5 w-5" />
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
-                <p className="text-sm text-zinc-350 leading-relaxed min-h-[48px] flex items-center">
+                <p className="text-sm text-foreground/90 leading-relaxed min-h-[48px] flex items-center">
                   Connects your Google Calendar so the AI assistant can track your schedule, check slot availability, and book meetings.
                 </p>
-                <div className="flex items-center justify-between pt-3 border-t border-zinc-950">
+                <div className="flex items-center justify-between pt-3 border-t border-border/40">
                   {hasCalendar ? (
                     <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-3 py-1 rounded-full">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>Connected</span>
                     </div>
                   ) : (
-                    <div className="text-xs text-zinc-500 font-medium">Not connected</div>
+                    <div className="text-xs text-muted-foreground font-medium">Not connected</div>
                   )}
 
                   {!hasCalendar ? (
                     <a href="/api/integrations/googlecalendar/connect">
-                      <Button className="bg-white text-black hover:bg-zinc-200 font-semibold text-xs py-1.5 px-4 rounded-lg cursor-pointer">
+                      <Button className="bg-foreground text-background hover:bg-foreground/90 font-semibold text-xs py-1.5 px-4 rounded-lg cursor-pointer">
                         Connect Calendar
                       </Button>
                     </a>
                   ) : (
-                    <span className="text-xs text-zinc-500 italic">Managed securely</span>
+                    <span className="text-xs text-muted-foreground italic">Managed securely</span>
                   )}
                 </div>
               </CardContent>
@@ -214,42 +214,42 @@ export default async function SettingsPage() {
         {/* Sync Statistics Section */}
         <section className="grid gap-6 md:grid-cols-3">
           
-          <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md">
+          <Card className="bg-card border-border/80 text-card-foreground shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-zinc-500 text-xs uppercase font-bold tracking-wider">Indexed Emails</CardDescription>
-              <CardTitle className="text-3xl font-bold font-serif text-white">{emailCount}</CardTitle>
+              <CardDescription className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Indexed Emails</CardDescription>
+              <CardTitle className="text-3xl font-bold font-serif text-foreground">{emailCount}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-zinc-400 leading-relaxed flex items-center gap-1.5">
+              <p className="text-xs text-muted-foreground leading-relaxed flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-emerald-500" />
                 Total messages ready for AI search
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md">
+          <Card className="bg-card border-border/80 text-card-foreground shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-zinc-500 text-xs uppercase font-bold tracking-wider">Indexed Events</CardDescription>
-              <CardTitle className="text-3xl font-bold font-serif text-white">{eventCount}</CardTitle>
+              <CardDescription className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Indexed Events</CardDescription>
+              <CardTitle className="text-3xl font-bold font-serif text-foreground">{eventCount}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-zinc-400 leading-relaxed flex items-center gap-1.5">
+              <p className="text-xs text-muted-foreground leading-relaxed flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-blue-500" />
                 Total calendar records synced
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md">
+          <Card className="bg-card border-border/80 text-card-foreground shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-zinc-500 text-xs uppercase font-bold tracking-wider">Sync Connection</CardDescription>
-              <CardTitle className="text-lg font-bold text-emerald-450 flex items-center gap-1.5">
+              <CardDescription className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Sync Connection</CardDescription>
+              <CardTitle className="text-lg font-bold text-emerald-400 flex items-center gap-1.5">
                 <ShieldCheck className="h-5 w-5 text-emerald-400" />
                 Active & Secure
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Real-time synchronization with secure Google servers is enabled.
               </p>
             </CardContent>
@@ -259,20 +259,20 @@ export default async function SettingsPage() {
         {/* Sync History / Event logs */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="h-5 w-5 text-zinc-500" />
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="h-5 w-5 text-muted-foreground" />
               Live Workspace Sync Log
             </h2>
-            <span className="text-xs bg-zinc-900 border border-zinc-800 text-zinc-500 px-2.5 py-0.5 rounded font-mono">
+            <span className="text-xs bg-muted/30 border border-border/80 text-muted-foreground px-2.5 py-0.5 rounded font-mono">
               Last 5 sync updates
             </span>
           </div>
 
-          <Card className="bg-zinc-900 border-zinc-850 text-zinc-50 shadow-md overflow-hidden">
-            <CardContent className="p-0 divide-y divide-zinc-950">
+          <Card className="bg-card border-border/80 text-card-foreground shadow-md overflow-hidden">
+            <CardContent className="p-0 divide-y divide-border/40">
               {syncLogs.length === 0 ? (
-                <div className="p-8 text-center text-sm text-zinc-500 flex flex-col items-center gap-2">
-                  <AlertTriangle className="h-8 w-8 text-zinc-650" />
+                <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
+                  <AlertTriangle className="h-8 w-8 text-muted-foreground" />
                   <span>No sync logs or webhook transactions registered in database yet.</span>
                 </div>
               ) : (
@@ -282,7 +282,7 @@ export default async function SettingsPage() {
                   const isSuccess = log.status === "success" || log.status === "completed" || !log.status; // defaults to success
 
                   return (
-                    <div key={log.id} className="p-4 flex items-center justify-between text-sm hover:bg-zinc-900/40 transition-colors">
+                    <div key={log.id} className="p-4 flex items-center justify-between text-sm hover:bg-muted/40 transition-colors">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className={`font-sans text-xs font-bold px-2 py-0.5 rounded ${
@@ -290,7 +290,7 @@ export default async function SettingsPage() {
                           }`}>
                             {serviceName}
                           </span>
-                          <span className="text-zinc-200 font-semibold">{formatEventName(log.eventType)}</span>
+                          <span className="text-foreground/90 font-semibold">{formatEventName(log.eventType)}</span>
                         </div>
                       </div>
 
@@ -300,7 +300,7 @@ export default async function SettingsPage() {
                         }`}>
                           {isSuccess ? "SUCCESS" : "FAILED"}
                         </span>
-                        <span className="text-xs text-zinc-500">{dateStr}</span>
+                        <span className="text-xs text-muted-foreground">{dateStr}</span>
                       </div>
                     </div>
                   );
@@ -311,10 +311,10 @@ export default async function SettingsPage() {
         </section>
 
         {/* Info banner */}
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/20 p-6 flex gap-4 items-start shadow-sm backdrop-blur-sm">
+        <div className="rounded-xl border border-border bg-card/40 p-6 flex gap-4 items-start shadow-sm backdrop-blur-sm">
           <ShieldCheck className="h-7 w-7 text-emerald-550 shrink-0 mt-0.5" />
-          <div className="text-base text-zinc-350 leading-relaxed">
-            <strong>Enterprise-Grade Security:</strong> All connections are secured under dynamic multi-tenant credentials. To guarantee maximum privacy, the Corsair engine uses double-envelope database encryption powered by your private environment key (<code className="text-zinc-300 font-mono">CORSAIR_KEK</code>), ensuring complete client isolation.
+          <div className="text-base text-foreground/90 leading-relaxed">
+            <strong>Enterprise-Grade Security:</strong> All connections are secured under dynamic multi-tenant credentials. To guarantee maximum privacy, the Corsair engine uses double-envelope database encryption powered by your private environment key (<code className="text-foreground font-mono">CORSAIR_KEK</code>), ensuring complete client isolation.
           </div>
         </div>
 

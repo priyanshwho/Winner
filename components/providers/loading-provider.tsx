@@ -91,11 +91,11 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
       {isLoading && (
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300 animate-in fade-in">
-          <div className="flex flex-col items-center space-y-4 p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800 shadow-2xl backdrop-blur-xl animate-in scale-in duration-200">
-            <Loader2 className="h-10 w-10 text-white animate-spin" />
+          <div className="flex flex-col items-center space-y-4 p-6 rounded-2xl bg-card/95 border border-border shadow-2xl backdrop-blur-xl animate-in scale-in duration-200">
+            <Loader2 className="h-10 w-10 text-primary animate-spin" />
             <div className="text-center">
-              <p className="text-sm font-semibold text-zinc-100 font-sans">Loading workspace</p>
-              <p className="text-[11px] text-zinc-500 mt-0.5 font-sans">Please wait, preparing content...</p>
+              <p className="text-sm font-semibold text-foreground font-sans">Loading workspace</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 font-sans">Please wait, preparing content...</p>
             </div>
           </div>
         </div>

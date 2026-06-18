@@ -7,6 +7,12 @@ import { ImageTrail } from "@/components/ui/image-trail";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
+import Features from "@/components/landing/features";
+import Testimonials from "@/components/landing/testimonials";
+import Pricing from "@/components/landing/pricing";
+import FAQs from "@/components/landing/faqs";
+import CTA from "@/components/landing/cta";
+import Footer from "@/components/landing/footer";
 
 export default function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,6 +50,11 @@ export default function LandingClient() {
 
     const tl = gsap.timeline({
       delay: 0.5,
+      onComplete: () => {
+        if (containerRef.current) {
+          containerRef.current.classList.add("loaded");
+        }
+      }
     });
 
     // 1. Scale and rotate preloader images in
@@ -206,44 +217,15 @@ export default function LandingClient() {
     };
   }, []);
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div ref={containerRef} className="landing-page-container">
-      {/* Image Trail Layer (rendered behind text) */}
-      <div className="absolute inset-0 z-1 pointer-events-none">
-        <ImageTrail containerRef={containerRef as any}>
-          <img
-            src="/_.jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-          <img
-            src="/Nature's Simplicity_ A Two-Tone Ode to Beauty.jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-          <img
-            src="/Silent Mystic Haven.jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-          <img
-            src="/Wallpaper programmer.jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-          <img
-            src="/_ (1).jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-          <img
-            src="/_ (2).jpeg"
-            alt=""
-            className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
-          />
-        </ImageTrail>
-      </div>
-
       {/* Preloader Overlay */}
       <div className="preloader">
         <div className="preloader-images">
@@ -276,14 +258,22 @@ export default function LandingClient() {
       </div>
 
       {/* Navigation */}
-      <nav>
+      <nav className="flex items-center justify-between w-full px-8 py-6 z-50">
         <div className="nav-logo">
           <Link href="/">Locus</Link>
         </div>
 
+        {/* Center scrolling links */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-muted-foreground bg-background/50 dark:bg-card/30 border border-border/10 rounded-full px-6 py-2 backdrop-blur-xs shadow-sm">
+          <button onClick={() => scrollToSection("features")} className="cursor-pointer hover:text-primary transition-colors">Features</button>
+          <button onClick={() => scrollToSection("testimonials")} className="cursor-pointer hover:text-primary transition-colors">Testimonials</button>
+          <button onClick={() => scrollToSection("pricing")} className="cursor-pointer hover:text-primary transition-colors">Pricing</button>
+          <button onClick={() => scrollToSection("faqs")} className="cursor-pointer hover:text-primary transition-colors">FAQs</button>
+        </div>
+
         <div className="nav-links flex items-center gap-6">
-          <Link href="/sign-in">Sign In</Link>
-          <Link href="/sign-up">Sign Up</Link>
+          <Link href="/sign-in" className="hover:text-primary transition-colors text-sm font-medium">Sign In</Link>
+          <Link href="/sign-up" className="flex h-9 items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors uppercase tracking-wider font-mono">Sign Up ✦</Link>
           <div className="nav-toggle-fade flex items-center justify-center">
             <ModeToggle />
           </div>
@@ -292,6 +282,42 @@ export default function LandingClient() {
 
       {/* Main Hero */}
       <section className="hero">
+        {/* Image Trail Layer (rendered behind text inside the hero section, stacking above z-1 overlay) */}
+        <div className="absolute inset-0 z-2 pointer-events-none">
+          <ImageTrail containerRef={containerRef as any}>
+            <img
+              src="/_.jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+            <img
+              src="/Nature's Simplicity_ A Two-Tone Ode to Beauty.jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+            <img
+              src="/Silent Mystic Haven.jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+            <img
+              src="/Wallpaper programmer.jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+            <img
+              src="/_ (1).jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+            <img
+              src="/_ (2).jpeg"
+              alt=""
+              className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-xl dark:border-[#141414]/20"
+            />
+          </ImageTrail>
+        </div>
+
         <div className="header">
           <Link href="/sign-in" className="cursor-pointer">
             <h1>Locus</h1>
@@ -310,6 +336,14 @@ export default function LandingClient() {
           </Link>
         </div>
       </section>
+
+      {/* Additional Page Sections */}
+      <Features />
+      <Testimonials />
+      <Pricing />
+      <FAQs />
+      <CTA />
+      <Footer />
     </div>
   );
 }

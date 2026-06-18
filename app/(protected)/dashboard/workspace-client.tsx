@@ -85,31 +85,31 @@ function MarkdownMessage({ content }: { content: string }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-        h1: ({ children }) => <h1 className="text-sm font-bold mb-2 text-zinc-100">{children}</h1>,
-        h2: ({ children }) => <h2 className="text-xs font-bold mb-1.5 text-zinc-100">{children}</h2>,
-        h3: ({ children }) => <h3 className="text-xs font-semibold mb-1 text-zinc-200">{children}</h3>,
-        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-0.5 pl-1">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-0.5 pl-1">{children}</ol>,
-        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-        strong: ({ children }) => <strong className="font-semibold text-zinc-100">{children}</strong>,
-        em: ({ children }) => <em className="italic text-zinc-300">{children}</em>,
+        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-foreground/90">{children}</p>,
+        h1: ({ children }) => <h1 className="text-sm font-bold mb-2 text-foreground">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-xs font-bold mb-1.5 text-foreground">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-xs font-semibold mb-1 text-foreground/90">{children}</h3>,
+        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-0.5 pl-1 text-foreground/90">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-0.5 pl-1 text-foreground/90">{children}</ol>,
+        li: ({ children }) => <li className="leading-relaxed text-foreground/90">{children}</li>,
+        strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+        em: ({ children }) => <em className="italic text-foreground/85">{children}</em>,
         code: ({ children, className }) => {
           const isBlock = className?.includes("language-");
           return isBlock ? (
-            <code className="block bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 my-2 text-[10px] font-mono text-emerald-400 overflow-x-auto whitespace-pre">{children}</code>
+            <code className="block bg-muted/40 border border-border/80 rounded-lg px-3 py-2 my-2 text-[10px] font-mono text-primary overflow-x-auto whitespace-pre">{children}</code>
           ) : (
-            <code className="bg-zinc-800 rounded px-1 py-0.5 text-[10px] font-mono text-emerald-400">{children}</code>
+            <code className="bg-muted border border-border/30 rounded px-1 py-0.5 text-[10px] font-mono text-primary">{children}</code>
           );
         },
         pre: ({ children }) => <pre className="my-2">{children}</pre>,
         blockquote: ({ children }) => (
-          <blockquote className="border-l-2 border-zinc-600 pl-3 my-2 text-zinc-400 italic">{children}</blockquote>
+          <blockquote className="border-l-2 border-border/80 pl-3 my-2 text-muted-foreground italic">{children}</blockquote>
         ),
         a: ({ href, children }) => (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">{children}</a>
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-2 font-medium">{children}</a>
         ),
-        hr: () => <hr className="border-zinc-800 my-3" />,
+        hr: () => <hr className="border-border/60 my-3" />,
       }}
     >
       {content}
@@ -507,10 +507,10 @@ export function WorkspaceClient({
   };
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-background text-foreground font-sans overflow-hidden">
       
       {/* 1. LEFT COLUMN: Sidebar Navigation Layout */}
-      <aside className={`bg-zinc-900 border-r border-zinc-800 flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out ${
+      <aside className={`bg-card border-r border-border flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out ${
         sidebarCollapsed ? "w-16" : "w-64"
       }`}>
         
@@ -518,18 +518,18 @@ export function WorkspaceClient({
         <div className="p-4 flex flex-col gap-4 overflow-hidden">
           <div className="flex items-center justify-between px-1 py-1">
             <div className="flex items-center gap-2 overflow-hidden">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-950 shadow-inner shrink-0">
-                <Star className="h-4.5 w-4.5 fill-current text-zinc-950" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-inner shrink-0">
+                <Star className="h-4.5 w-4.5 fill-current text-primary-foreground" />
               </div>
               {!sidebarCollapsed && (
-                <span className="text-lg font-bold font-serif tracking-tight text-white transition-opacity duration-300">
+                <span className="text-lg font-bold font-serif tracking-tight text-foreground transition-opacity duration-300">
                   Locus
                 </span>
               )}
             </div>
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-zinc-500 hover:text-zinc-200 p-1 rounded-md hover:bg-zinc-800 transition-colors shrink-0"
+              className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors shrink-0"
               title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               <ChevronRight className={`h-4.5 w-4.5 transform transition-transform duration-300 ${sidebarCollapsed ? "" : "rotate-180"}`} />
@@ -539,7 +539,7 @@ export function WorkspaceClient({
           <Button 
             onClick={createNewChat}
             variant="outline" 
-            className={`justify-start gap-2 border-zinc-800 bg-zinc-950 text-zinc-200 hover:bg-zinc-800 hover:text-white transition-all ${
+            className={`justify-start gap-2 border-border bg-background text-foreground hover:bg-muted hover:text-foreground transition-all ${
               sidebarCollapsed ? "w-10 h-10 p-0 justify-center mx-auto" : "w-full px-3"
             }`}
             title={sidebarCollapsed ? "New Chat" : undefined}
@@ -569,8 +569,8 @@ export function WorkspaceClient({
                 title={tab.label}
                 className={`flex items-center rounded-lg text-sm transition-all text-left ${
                   activeTab === tab.id && !showSearchResults && !tab.action
-                    ? "bg-zinc-800 text-white font-medium shadow-sm"
-                    : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
+                    ? "bg-accent text-accent-foreground font-medium shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 } ${
                   sidebarCollapsed ? "w-10 h-10 p-0 justify-center mx-auto" : "w-full px-3 py-2 gap-2.5"
                 }`}
@@ -584,7 +584,7 @@ export function WorkspaceClient({
           {/* Conversations Log */}
           {!sidebarCollapsed && (
             <div className="flex-1 overflow-y-auto space-y-1.5 pt-3 pr-1 transition-opacity duration-300">
-              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-2 pb-1.5">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 pb-1.5">
                 Recent Conversations
               </div>
               {conversations.map((c) => (
@@ -593,8 +593,8 @@ export function WorkspaceClient({
                   onClick={() => selectConversation(c.id)}
                   className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-all text-left truncate ${
                     activeTab === "chat" && activeChatId === c.id && !showSearchResults
-                      ? "bg-zinc-800 text-white font-medium"
-                      : "text-zinc-350 hover:bg-zinc-900 hover:text-zinc-250"
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "text-muted-foreground/90 hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
@@ -606,8 +606,8 @@ export function WorkspaceClient({
         </div>
 
         {/* Profile Card and Sign Out */}
-        <div className="p-4 border-t border-zinc-800">
-          <div className={`flex items-center justify-between p-2 rounded-xl bg-zinc-950/40 border border-zinc-900 transition-all ${
+        <div className="p-4 border-t border-border">
+          <div className={`flex items-center justify-between p-2 rounded-xl bg-background/40 border border-border/50 transition-all ${
             sidebarCollapsed ? "flex-col gap-2 p-1" : ""
           }`}>
             <div className={`flex items-center gap-2.5 overflow-hidden ${
@@ -616,20 +616,20 @@ export function WorkspaceClient({
               {userImage ? (
                 <img src={userImage} alt={userName} className="h-8 w-8 rounded-full" />
               ) : (
-                <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-350 shrink-0">
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground shrink-0">
                   {userName[0]?.toUpperCase() || "U"}
                 </div>
               )}
               {!sidebarCollapsed && (
                 <div className="flex flex-col truncate transition-opacity duration-300">
-                  <span className="text-xs font-semibold text-zinc-200 truncate">{userName}</span>
-                  <span className="text-[10px] text-zinc-500 truncate">{userEmail}</span>
+                  <span className="text-xs font-semibold text-foreground truncate">{userName}</span>
+                  <span className="text-[10px] text-muted-foreground truncate">{userEmail}</span>
                 </div>
               )}
             </div>
             <button 
               onClick={handleSignOut}
-              className="text-zinc-500 hover:text-zinc-200 p-1.5 rounded-md hover:bg-zinc-900 transition-colors"
+              className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted transition-colors"
               title="Sign Out"
             >
               <LogOut className="h-4 w-4" />
@@ -639,28 +639,28 @@ export function WorkspaceClient({
       </aside>
 
       {/* 2. MIDDLE COLUMN: Main dynamic dashboard views */}
-      <section className="flex-1 flex flex-col bg-zinc-950 border-r border-zinc-900 overflow-hidden relative">
+      <section className="flex-1 flex flex-col bg-background border-r border-border/60 overflow-hidden relative">
         
         {/* Top Header with Unified Search Input */}
-        <header className="h-14 border-b border-zinc-900 flex items-center justify-between px-6 shrink-0 bg-zinc-950/60 backdrop-blur-sm z-10 gap-4">
-          <div className="text-sm font-semibold text-zinc-200 shrink-0">
+        <header className="h-14 border-b border-border/60 flex items-center justify-between px-6 shrink-0 bg-background/60 backdrop-blur-sm z-10 gap-4">
+          <div className="text-sm font-semibold text-foreground/90 shrink-0">
             {showSearchResults ? "Search Results" : activeTab === "chat" ? "AI Assistant" : activeTab === "inbox" ? "Emails Inbox" : "Calendar Events"}
           </div>
 
           <div className="flex items-center gap-2 max-w-sm w-full">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-550" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
               <input
                 type="text"
                 placeholder="Search emails or events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-1.5 text-xs placeholder-zinc-500 text-zinc-200 focus:outline-none focus:border-zinc-700 transition-colors"
+                className="w-full bg-card border border-border rounded-xl pl-9 pr-4 py-1.5 text-xs placeholder-muted-foreground text-foreground focus:outline-none focus:border-border/80 transition-colors"
               />
               {searchQuery && (
                 <button 
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-550 hover:text-zinc-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/60 hover:text-foreground"
                 >
                   Clear
                 </button>
@@ -670,12 +670,12 @@ export function WorkspaceClient({
               variant="outline"
               size="sm"
               onClick={() => setOpenCommandPalette(true)}
-              className="h-8 border-zinc-850 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 text-xs px-2 gap-1 cursor-pointer"
+              className="h-8 border-border/80 bg-card text-muted-foreground hover:bg-muted hover:text-foreground text-xs px-2 gap-1 cursor-pointer"
               title="Open Command Palette (⌘K)"
             >
               <span className="font-mono text-[10px]">⌘K</span>
             </Button>
-            <div className="h-8 w-8 flex items-center justify-center border border-zinc-850 bg-zinc-900 hover:bg-zinc-800 rounded-xl overflow-hidden shrink-0">
+            <div className="h-8 w-8 flex items-center justify-center border border-border/80 bg-card hover:bg-muted rounded-xl overflow-hidden shrink-0">
               <ModeToggle />
             </div>
           </div>
@@ -687,25 +687,25 @@ export function WorkspaceClient({
           {/* SEARCH MATCHES OVERLAY */}
           {showSearchResults && (
             <div className="p-6 space-y-6">
-              <h2 className="text-lg font-bold font-serif text-white">Search matches found in cache</h2>
+              <h2 className="text-lg font-bold font-serif text-foreground">Search matches found in cache</h2>
               
               {searchLoading ? (
-                <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 py-12">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-12">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <span>Parsing search criteria...</span>
                 </div>
               ) : !searchResults || (searchResults.emails.length === 0 && searchResults.events.length === 0) ? (
                 <div className="text-center py-12 space-y-2">
-                  <ShieldAlert className="h-9 w-9 text-zinc-650 mx-auto" />
-                  <p className="text-xs text-zinc-500 font-medium">No matching emails or meetings registered in cache database.</p>
+                  <ShieldAlert className="h-9 w-9 text-muted-foreground/70 mx-auto" />
+                  <p className="text-xs text-muted-foreground font-medium">No matching emails or meetings registered in cache database.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {/* Email matches */}
                   {searchResults.emails.length > 0 && (
                     <div className="space-y-2">
-                      <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Emails</h3>
-                      <div className="divide-y divide-zinc-900 border border-zinc-900 rounded-xl overflow-hidden bg-zinc-900/15">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Emails</h3>
+                      <div className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-muted/15">
                         {searchResults.emails.map((email) => (
                           <button
                             key={email.id}
@@ -715,14 +715,14 @@ export function WorkspaceClient({
                               setShowSearchResults(false);
                               setSearchQuery("");
                             }}
-                            className="w-full p-4 flex flex-col gap-1 items-start text-left hover:bg-zinc-900/60 transition-colors"
+                            className="w-full p-4 flex flex-col gap-1 items-start text-left hover:bg-muted/60 transition-colors"
                           >
                             <div className="flex items-center justify-between w-full">
-                              <span className="text-sm font-bold text-zinc-300">{email.sender}</span>
-                              <span className="text-xs text-zinc-550">{new Date(email.receivedAt).toLocaleDateString()}</span>
+                              <span className="text-sm font-bold text-foreground/90">{email.sender}</span>
+                              <span className="text-xs text-muted-foreground/60">{new Date(email.receivedAt).toLocaleDateString()}</span>
                             </div>
-                            <span className="text-sm text-white font-semibold line-clamp-1">{email.subject}</span>
-                            <span className="text-xs text-zinc-450 line-clamp-1">{email.snippet}</span>
+                            <span className="text-sm text-foreground font-semibold line-clamp-1">{email.subject}</span>
+                            <span className="text-xs text-muted-foreground/85 line-clamp-1">{email.snippet}</span>
                           </button>
                         ))}
                       </div>
@@ -732,8 +732,8 @@ export function WorkspaceClient({
                   {/* Calendar matches */}
                   {searchResults.events.length > 0 && (
                     <div className="space-y-2">
-                      <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Meetings</h3>
-                      <div className="divide-y divide-zinc-900 border border-zinc-900 rounded-xl overflow-hidden bg-zinc-900/15">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Meetings</h3>
+                      <div className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-muted/15">
                         {searchResults.events.map((event) => (
                           <button
                             key={event.id}
@@ -742,13 +742,13 @@ export function WorkspaceClient({
                               setShowSearchResults(false);
                               setSearchQuery("");
                             }}
-                            className="w-full p-4 flex flex-col gap-1 items-start text-left hover:bg-zinc-900/60 transition-colors"
+                            className="w-full p-4 flex flex-col gap-1 items-start text-left hover:bg-muted/60 transition-colors"
                           >
                             <div className="flex items-center justify-between w-full">
-                              <span className="text-sm font-bold text-zinc-200">{event.title}</span>
-                              <span className="text-xs text-zinc-550">{new Date(event.startTime).toLocaleDateString()}</span>
+                              <span className="text-sm font-bold text-foreground/90">{event.title}</span>
+                              <span className="text-xs text-muted-foreground/60">{new Date(event.startTime).toLocaleDateString()}</span>
                             </div>
-                            <span className="text-xs text-zinc-405">
+                            <span className="text-xs text-muted-foreground/80">
                               Time: {new Date(event.startTime).toLocaleTimeString()} - {new Date(event.endTime).toLocaleTimeString()}
                             </span>
                           </button>
@@ -767,16 +767,16 @@ export function WorkspaceClient({
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                 {messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center max-w-xl mx-auto text-center space-y-8 py-10">
-                    <div className="h-16 w-16 rounded-2xl bg-zinc-900 border border-zinc-850 flex items-center justify-center text-zinc-350 shadow-lg relative group transition-all duration-300 hover:border-zinc-700">
-                      <div className="absolute inset-0 bg-gradient-to-tr from-zinc-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Sparkles className="h-7 w-7 text-zinc-200" />
+                    <div className="h-16 w-16 rounded-2xl bg-card border border-border flex items-center justify-center text-muted-foreground shadow-lg relative group transition-all duration-300 hover:border-border/80">
+                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Sparkles className="h-7 w-7 text-foreground/90" />
                     </div>
                     
                     <div className="space-y-2">
-                      <h2 className="text-3xl font-extrabold font-serif text-white tracking-tight leading-tight">
+                      <h2 className="text-3xl font-extrabold font-serif text-foreground tracking-tight leading-tight">
                         Workspace AI Assistant
                       </h2>
-                      <p className="text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
                         Query your cached correspondence, draft response text, check calendar conflicts, or trigger direct event creation via command parameters.
                       </p>
                     </div>
@@ -790,10 +790,10 @@ export function WorkspaceClient({
                         <button
                           key={i}
                           onClick={() => setInput(promptText)}
-                          className="group p-4 flex items-center justify-between text-left rounded-xl border border-zinc-800/80 bg-zinc-900/35 text-sm text-zinc-350 hover:text-white hover:border-zinc-700 hover:bg-zinc-900/70 transition-all duration-200 font-semibold shadow-sm cursor-pointer"
+                          className="group p-4 flex items-center justify-between text-left rounded-xl border border-border/80 bg-card/35 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 transition-all duration-200 font-semibold shadow-sm cursor-pointer"
                         >
                           <span>{promptText}</span>
-                          <ArrowRight className="h-4 w-4 text-zinc-500 group-hover:text-zinc-300 group-hover:translate-x-1 transition-all duration-200" />
+                          <ArrowRight className="h-4 w-4 text-muted-foreground/80 group-hover:text-foreground group-hover:translate-x-1 transition-all duration-200" />
                         </button>
                       ))}
                     </div>
@@ -808,12 +808,12 @@ export function WorkspaceClient({
                         className={`flex gap-3.5 items-start ${m.role === "user" ? "flex-row-reverse" : ""}`}
                       >
                         <div className={`h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold shadow-sm ${
-                          m.role === "user" ? "bg-zinc-100 text-zinc-950" : "bg-zinc-850 border border-zinc-700 text-zinc-200"
+                          m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary border border-border text-foreground/90"
                         }`}>
-                          {m.role === "user" ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5 text-zinc-250" />}
+                          {m.role === "user" ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />}
                         </div>
                         <div className={`rounded-2xl px-4 py-3.5 max-w-[85%] text-sm leading-relaxed ${
-                          m.role === "user" ? "bg-zinc-800 text-zinc-100 font-medium animate-in fade-in slide-in-from-bottom-2 duration-300" : "bg-zinc-900 border border-zinc-900/50 text-zinc-200 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                          m.role === "user" ? "bg-primary/90 text-primary-foreground font-medium animate-in fade-in slide-in-from-bottom-2 duration-300" : "bg-card border border-border/50 text-foreground animate-in fade-in slide-in-from-bottom-2 duration-300"
                         }`}>
                           {m.role === "user" ? (
                             <div className="whitespace-pre-wrap">{getMessageText(m)}</div>
@@ -831,12 +831,12 @@ export function WorkspaceClient({
                       })()
                     ) && (
                       <div className="flex gap-3.5 items-start">
-                        <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-zinc-850 border border-zinc-700 text-zinc-200">
-                          <Bot className="h-3.5 w-3.5 text-zinc-250" />
+                        <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground/90">
+                          <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />
                         </div>
-                        <div className="rounded-2xl px-4 py-2 bg-zinc-900 border border-zinc-900/50 text-zinc-500 text-[11px] flex items-center gap-2">
-                          <RefreshCw className="h-3 w-3 animate-spin text-zinc-550" />
-                          <span>Atria is thinking...</span>
+                        <div className="rounded-2xl px-4 py-2 bg-card border border-border/50 text-muted-foreground text-[11px] flex items-center gap-2">
+                          <RefreshCw className="h-3 w-3 animate-spin text-muted-foreground/60" />
+                          <span>Locus is thinking...</span>
                         </div>
                       </div>
                     )}
@@ -846,10 +846,10 @@ export function WorkspaceClient({
               </div>
 
               {/* Chat Input form */}
-              <div className="p-4 border-t border-zinc-900 bg-zinc-950/80 backdrop-blur-sm shrink-0">
+              <div className="p-4 border-t border-border bg-background/80 backdrop-blur-sm shrink-0">
                 <form 
                   onSubmit={handleChatSubmit}
-                  className="max-w-2xl mx-auto relative flex items-center bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-1.5 hover:border-zinc-700 focus-within:border-zinc-650 transition-all shadow-inner"
+                  className="max-w-2xl mx-auto relative flex items-center bg-card border border-border rounded-xl px-3.5 py-1.5 hover:border-border/80 focus-within:border-border transition-all shadow-inner"
                 >
                   <input 
                     type="text" 
@@ -857,12 +857,12 @@ export function WorkspaceClient({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 py-2.5 pr-14 focus:outline-none focus:ring-0"
+                    className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground py-2.5 pr-14 focus:outline-none focus:ring-0"
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="absolute right-3 p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-950 disabled:opacity-30 disabled:hover:bg-zinc-100 transition-all cursor-pointer shadow-sm"
+                    className="absolute right-3 p-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 disabled:hover:bg-primary transition-all cursor-pointer shadow-sm animate-in fade-in"
                   >
                     <Send className="h-4.5 w-4.5" />
                   </button>
@@ -875,17 +875,17 @@ export function WorkspaceClient({
           {activeTab === "inbox" && !showSearchResults && (
             <div className="p-4 space-y-4">
               {emailsLoading ? (
-                <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 py-24">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-24">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <span>Loading Gmail cache...</span>
                 </div>
               ) : emails.length === 0 ? (
                 <div className="text-center py-24 space-y-2">
-                  <Inbox className="h-12 w-12 text-zinc-650 mx-auto" />
-                  <p className="text-xs text-zinc-500">Inbox cache database is empty or links are initializing.</p>
+                  <Inbox className="h-12 w-12 text-muted-foreground/70 mx-auto" />
+                  <p className="text-xs text-muted-foreground">Inbox cache database is empty or links are initializing.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-900 border border-zinc-900 rounded-xl bg-zinc-900/10 overflow-hidden">
+                <div className="divide-y divide-border border border-border rounded-xl bg-muted/10 overflow-hidden">
                   {emails.map((email) => (
                     <button
                       key={email.id}
@@ -896,18 +896,18 @@ export function WorkspaceClient({
                       }}
                       className={`w-full p-4 flex flex-col gap-1 items-start text-left transition-colors ${
                         selectedEmail?.id === email.id 
-                          ? "bg-zinc-900/80 hover:bg-zinc-900/80" 
-                          : "hover:bg-zinc-900/40"
+                          ? "bg-muted hover:bg-muted" 
+                          : "hover:bg-muted/40"
                       }`}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span className="text-sm font-bold text-zinc-300">{email.sender}</span>
-                        <span className="text-xs text-zinc-500">
+                        <span className="text-sm font-bold text-foreground/80">{email.sender}</span>
+                        <span className="text-xs text-muted-foreground">
                           {new Date(email.receivedAt).toLocaleDateString()} {new Date(email.receivedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-white line-clamp-1">{email.subject}</span>
-                      <span className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{email.snippet}</span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-1">{email.subject}</span>
+                      <span className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">{email.snippet}</span>
                     </button>
                   ))}
                 </div>
@@ -919,19 +919,19 @@ export function WorkspaceClient({
           {activeTab === "calendar" && !showSearchResults && (
             <div className="p-6 space-y-4">
               <div className="space-y-1">
-                <h2 className="text-base font-bold font-serif text-white">Upcoming Events List</h2>
-                <p className="text-xs text-zinc-550">Track date conflicts and guest responses linked under calendar.</p>
+                <h2 className="text-base font-bold font-serif text-foreground">Upcoming Events List</h2>
+                <p className="text-xs text-muted-foreground/60">Track date conflicts and guest responses linked under calendar.</p>
               </div>
 
               {eventsLoading ? (
-                <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 py-24">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-24">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <span>Loading events...</span>
                 </div>
               ) : events.length === 0 ? (
                 <div className="text-center py-24 space-y-2">
-                  <CalendarDays className="h-12 w-12 text-zinc-655 mx-auto" />
-                  <p className="text-xs text-zinc-500">No scheduled events found in calendar cache.</p>
+                  <CalendarDays className="h-12 w-12 text-muted-foreground/70 mx-auto" />
+                  <p className="text-xs text-muted-foreground">No scheduled events found in calendar cache.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -940,22 +940,22 @@ export function WorkspaceClient({
                     const end = new Date(event.endTime);
                     const guests = Array.isArray(event.attendees) ? event.attendees : [];
                     return (
-                      <div key={event.id} className="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 hover:bg-zinc-900/40 transition-colors flex justify-between items-start gap-4">
+                      <div key={event.id} className="p-4 rounded-xl border border-border bg-card/25 hover:bg-muted/40 transition-colors flex justify-between items-start gap-4 animate-in fade-in">
                         <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-white leading-tight">{event.title}</h4>
-                          <p className="text-xs text-zinc-400">
+                          <h4 className="text-sm font-bold text-foreground leading-tight">{event.title}</h4>
+                          <p className="text-xs text-muted-foreground">
                             {start.toLocaleDateString()} @ {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                           {guests.length > 0 && (
                             <div className="flex items-center gap-1.5 pt-1">
-                              <UserCheck className="h-3.5 w-3.5 text-zinc-500" />
-                              <span className="text-xs text-zinc-550 truncate max-w-sm">
+                              <UserCheck className="h-3.5 w-3.5 text-muted-foreground/80" />
+                              <span className="text-xs text-muted-foreground/60 truncate max-w-sm">
                                 Guests: {guests.join(", ")}
                               </span>
                             </div>
                           )}
                         </div>
-                        <div className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-sans shrink-0">
+                        <div className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded font-sans shrink-0 border border-border/40">
                           Primary
                         </div>
                       </div>
@@ -968,11 +968,11 @@ export function WorkspaceClient({
 
           {/* D. CONFIGURATION SETTINGS VIEWPORT */}
           {activeTab === "configuration" && !showSearchResults && (
-            <div className="p-6 space-y-6 max-w-2xl mx-auto w-full">
+            <div className="p-6 space-y-6 max-w-2xl mx-auto w-full animate-in fade-in">
               
               <div className="space-y-1">
-                <h1 className="text-xl font-bold font-serif text-white">Integrations Settings</h1>
-                <p className="text-xs text-zinc-400">
+                <h1 className="text-xl font-bold font-serif text-foreground">Integrations Settings</h1>
+                <p className="text-xs text-muted-foreground">
                   Manage external API credentials and link your personal workspace tools.
                 </p>
               </div>
@@ -980,13 +980,13 @@ export function WorkspaceClient({
               {notification && (
                 <div className={`p-4 rounded-xl border flex gap-3 items-start ${
                   notification.type === "success" 
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-                    : "bg-red-500/10 border-red-500/20 text-red-400"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                    : "bg-destructive/10 border-destructive/20 text-destructive"
                 }`}>
                   {notification.type === "success" ? (
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
                   ) : (
-                    <AlertCircle className="h-5 w-5 shrink-0 text-red-400" />
+                    <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
                   )}
                   <div className="text-sm leading-relaxed">{notification.message}</div>
                 </div>
@@ -995,36 +995,36 @@ export function WorkspaceClient({
               <div className="grid gap-6 sm:grid-cols-2">
                 
                 {/* Gmail connection card */}
-                <Card className="bg-zinc-900 border-zinc-800 text-zinc-50 shadow-md">
+                <Card className="bg-card border-border/80 text-card-foreground shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
                     <div>
                       <CardTitle className="text-sm font-bold">Gmail Inbox</CardTitle>
-                      <CardDescription className="text-zinc-500 text-[10px]">Read, draft, and query mailboxes</CardDescription>
+                      <CardDescription className="text-muted-foreground text-[10px]">Read, draft, and query mailboxes</CardDescription>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-red-500/10 text-red-500">
+                    <div className="p-2.5 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20">
                       <Mail className="h-4.5 w-4.5" />
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-xs text-zinc-400 leading-relaxed min-h-[40px] flex items-center">
+                    <p className="text-xs text-muted-foreground leading-relaxed min-h-[40px] flex items-center">
                       Authorizes Atria's sync agent to read, organize, and build index caches for your Gmail correspondence.
                     </p>
                     <div className="flex items-center justify-between pt-2">
                       {initialHasGmail ? (
                         <>
-                          <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2.5 py-1 rounded-full">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             <span>Connected</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-zinc-200 text-xs hover:bg-zinc-800" disabled>
+                          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs hover:bg-muted" disabled>
                             Configure
                           </Button>
                         </>
                       ) : (
                         <>
-                          <div className="text-xs text-zinc-500 font-medium">Not linked</div>
+                          <div className="text-xs text-muted-foreground font-medium">Not linked</div>
                           <a href="/api/integrations/gmail/connect">
-                            <Button size="sm" className="bg-white text-black hover:bg-zinc-200 font-semibold">
+                            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/95 font-semibold">
                               Connect Gmail
                             </Button>
                           </a>
@@ -1035,36 +1035,36 @@ export function WorkspaceClient({
                 </Card>
 
                 {/* Google Calendar connection card */}
-                <Card className="bg-zinc-900 border-zinc-800 text-zinc-50 shadow-md">
+                <Card className="bg-card border-border/80 text-card-foreground shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
                     <div>
                       <CardTitle className="text-sm font-bold">Google Calendar</CardTitle>
-                      <CardDescription className="text-zinc-500 text-[10px]">Manage events and schedules</CardDescription>
+                      <CardDescription className="text-muted-foreground text-[10px]">Manage events and schedules</CardDescription>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
+                    <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
                       <Calendar className="h-4.5 w-4.5" />
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-xs text-zinc-400 leading-relaxed min-h-[40px] flex items-center">
+                    <p className="text-xs text-muted-foreground leading-relaxed min-h-[40px] flex items-center">
                       Allows scheduling meetings, checking conflict parameters, and posting calendar updates via prompt.
                     </p>
                     <div className="flex items-center justify-between pt-2">
                       {initialHasCalendar ? (
                         <>
-                          <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2.5 py-1 rounded-full">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             <span>Connected</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-zinc-200 text-xs hover:bg-zinc-800" disabled>
+                          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs hover:bg-muted" disabled>
                             Configure
                           </Button>
                         </>
                       ) : (
                         <>
-                          <div className="text-xs text-zinc-500 font-medium">Not linked</div>
+                          <div className="text-xs text-muted-foreground font-medium">Not linked</div>
                           <a href="/api/integrations/googlecalendar/connect">
-                            <Button size="sm" className="bg-white text-black hover:bg-zinc-200 font-semibold">
+                            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/95 font-semibold">
                               Connect Calendar
                             </Button>
                           </a>
@@ -1075,10 +1075,10 @@ export function WorkspaceClient({
                 </Card>
               </div>
 
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/10 p-4 flex gap-3 items-start">
-                <AlertCircle className="h-5 w-5 text-zinc-500 shrink-0" />
-                <div className="text-xs text-zinc-450 leading-relaxed">
-                  <strong>Multi-Tenancy note:</strong> Linking these services automatically binds them under your unique Tenant ID: <code className="text-zinc-200 bg-zinc-900 border border-zinc-800 px-1 rounded">{userId}</code>. Your personal emails and events will never be shared with other users.
+              <div className="rounded-xl border border-border bg-card/10 p-4 flex gap-3 items-start">
+                <AlertCircle className="h-5 w-5 text-muted-foreground shrink-0 animate-pulse" />
+                <div className="text-xs text-muted-foreground leading-relaxed">
+                  <strong>Multi-Tenancy note:</strong> Linking these services automatically binds them under your unique Tenant ID: <code className="text-foreground bg-muted border border-border px-1.5 py-0.5 rounded font-mono">{userId}</code>. Your personal emails and events will never be shared with other users.
                 </div>
               </div>
             </div>
@@ -1089,38 +1089,38 @@ export function WorkspaceClient({
 
       {/* 3. RIGHT COLUMN: Context panels */}
       {activeTab !== "chat" && (
-        <section className={`${activeTab === "inbox" ? "w-[400px]" : "w-80"} bg-zinc-900/50 flex flex-col overflow-y-auto shrink-0 p-5 space-y-6 border-l border-zinc-900`}>
+        <section className={`${activeTab === "inbox" ? "w-[400px]" : "w-80"} bg-card/40 flex flex-col overflow-y-auto shrink-0 p-5 space-y-6 border-l border-border/60`}>
           
           {/* B. CONTEXT: INBOX TAB */}
           {activeTab === "inbox" && (
             <div className="space-y-6">
-              <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">Email Details</h3>
+              <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">Email Details</h3>
               
               {!selectedEmail ? (
                 <div className="text-center py-16 space-y-3">
-                  <FileText className="h-10 w-10 text-zinc-650 mx-auto" />
-                  <p className="text-sm text-zinc-500 font-medium">Select an email from the inbox list to read details.</p>
+                  <FileText className="h-10 w-10 text-muted-foreground/60 mx-auto" />
+                  <p className="text-sm text-muted-foreground font-medium">Select an email from the inbox list to read details.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   
                   {/* Details layout - premium card */}
-                  <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950/50 space-y-4 shadow-xl">
+                  <div className="p-5 rounded-2xl border border-border bg-card/50 space-y-4 shadow-xl select-text">
                     <div>
-                      <span className="text-xs font-bold text-zinc-550 uppercase tracking-wider block mb-1">Sender</span>
-                      <p className="text-sm font-bold text-zinc-100 break-words leading-snug">{selectedEmail.sender}</p>
+                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Sender</span>
+                      <p className="text-sm font-bold text-foreground break-words leading-snug">{selectedEmail.sender}</p>
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-zinc-550 uppercase tracking-wider block mb-1">Subject</span>
-                      <p className="text-base font-extrabold text-white leading-snug break-words">{selectedEmail.subject}</p>
+                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Subject</span>
+                      <p className="text-base font-extrabold text-foreground leading-snug break-words">{selectedEmail.subject}</p>
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-zinc-550 uppercase tracking-wider block mb-1">Received</span>
-                      <p className="text-sm text-zinc-400 font-medium">{new Date(selectedEmail.receivedAt).toLocaleString()}</p>
+                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Received</span>
+                      <p className="text-sm text-muted-foreground font-medium">{new Date(selectedEmail.receivedAt).toLocaleString()}</p>
                     </div>
-                    <div className="pt-4 border-t border-zinc-900">
-                      <span className="text-xs font-bold text-zinc-550 uppercase tracking-wider block mb-2">{selectedEmail.body ? "Message Content" : "Snippet"}</span>
-                      <div className="text-sm text-zinc-300 leading-relaxed break-words select-text whitespace-pre-wrap max-h-[300px] overflow-y-auto pr-1">
+                    <div className="pt-4 border-t border-border/60">
+                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-2">{selectedEmail.body ? "Message Content" : "Snippet"}</span>
+                      <div className="text-sm text-foreground/90 leading-relaxed break-words select-text whitespace-pre-wrap max-h-[300px] overflow-y-auto pr-1">
                         {selectedEmail.body || selectedEmail.snippet}
                       </div>
                     </div>
@@ -1128,66 +1128,66 @@ export function WorkspaceClient({
 
                   {/* AI Actions */}
                   <div className="space-y-5">
-                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">AI Assistant Actions</h4>
+                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">AI Assistant Actions</h4>
                     
                     {/* Summary action */}
                     <div className="space-y-2">
                       <Button 
                         onClick={() => handleSummarizeEmail(selectedEmail.gmailId)}
                         disabled={aiSummaryLoading}
-                        className="w-full bg-zinc-850 hover:bg-zinc-800 text-zinc-250 text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-zinc-800 rounded-xl"
+                        className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
                       >
-                        {aiSummaryLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />}
+                        {aiSummaryLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-primary animate-pulse" />}
                         <span>Generate Bullet Summary</span>
                       </Button>
 
                       {aiSummary && (
-                        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-950/35 text-sm text-zinc-300 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner">
+                        <div className="p-4 rounded-2xl border border-border bg-card/35 text-sm text-foreground/90 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner">
                           <button 
                             onClick={() => copyToClipboard(aiSummary)}
-                            className="absolute right-3 top-3 p-1.5 text-zinc-500 hover:text-zinc-200 rounded hover:bg-zinc-900 transition-colors"
+                            className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors cursor-pointer"
                             title="Copy Summary"
                           >
                             <Clipboard className="h-4 w-4" />
                           </button>
-                          <strong className="text-xs font-bold text-zinc-550 uppercase tracking-wider block pb-2">AI Summary</strong>
+                          <strong className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block pb-2">AI Summary</strong>
                           {aiSummary}
                         </div>
                       )}
                     </div>
 
                     {/* AI drafting replies */}
-                    <div className="space-y-3.5 pt-4 border-t border-zinc-900">
+                    <div className="space-y-3.5 pt-4 border-t border-border">
                       <div className="space-y-1.5">
-                        <span className="text-xs font-semibold text-zinc-450 block">Drafting instructions (optional)</span>
+                        <span className="text-xs font-semibold text-muted-foreground block">Drafting instructions (optional)</span>
                         <input 
                           type="text" 
                           placeholder="e.g., politely decline, ask to reschedule..." 
                           value={draftInstructions}
                           onChange={(e) => setDraftInstructions(e.target.value)}
-                          className="w-full bg-zinc-955 border border-zinc-850 rounded-xl p-3 h-10 text-sm text-zinc-200 placeholder-zinc-650 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                          className="w-full bg-background border border-border rounded-xl p-3 h-10 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80 focus:ring-1 focus:ring-ring"
                         />
                       </div>
 
                       <Button 
                         onClick={() => handleDraftReply(selectedEmail.gmailId)}
                         disabled={aiDraftLoading}
-                        className="w-full bg-zinc-850 hover:bg-zinc-800 text-zinc-250 text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-zinc-800 rounded-xl"
+                        className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
                       >
-                        {aiDraftLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Edit3 className="h-4 w-4 text-zinc-300" />}
+                        {aiDraftLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Edit3 className="h-4 w-4 text-foreground/80" />}
                         <span>Generate Response Draft</span>
                       </Button>
 
                       {aiDraft && (
-                        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-950/35 text-sm text-zinc-300 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner">
+                        <div className="p-4 rounded-2xl border border-border bg-card/35 text-sm text-foreground/90 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner">
                           <button 
                             onClick={() => copyToClipboard(aiDraft)}
-                            className="absolute right-3 top-3 p-1.5 text-zinc-500 hover:text-zinc-200 rounded hover:bg-zinc-900 transition-colors"
+                            className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors cursor-pointer"
                             title="Copy Draft"
                           >
                             <Clipboard className="h-4 w-4" />
                           </button>
-                          <strong className="text-xs font-bold text-zinc-550 uppercase tracking-wider block pb-2">Reply Draft</strong>
+                          <strong className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block pb-2">Reply Draft</strong>
                           {aiDraft}
                         </div>
                       )}
@@ -1202,66 +1202,66 @@ export function WorkspaceClient({
 
         {/* C. CONTEXT: CALENDAR TAB */}
         {activeTab === "calendar" && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in">
             <div className="space-y-1">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Visual Scheduler</h3>
-              <p className="text-[11px] text-zinc-550">Create new Google calendar events dynamically.</p>
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Visual Scheduler</h3>
+              <p className="text-[11px] text-muted-foreground/60">Create new Google calendar events dynamically.</p>
             </div>
 
             {/* Event Form creation */}
-            <form onSubmit={handleCreateEvent} className="p-4 rounded-xl border border-zinc-850 bg-zinc-950/20 space-y-4 text-xs">
-              <h4 className="text-xs font-bold text-zinc-200 font-serif">Schedule Meeting</h4>
+            <form onSubmit={handleCreateEvent} className="p-4 rounded-xl border border-border bg-card/25 space-y-4 text-xs">
+              <h4 className="text-xs font-bold text-foreground font-serif">Schedule Meeting</h4>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-500 font-bold uppercase block">Meeting Title *</label>
+                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Meeting Title *</label>
                 <input 
                   type="text" 
                   required
                   placeholder="e.g. Sync with HR, Review roadmap..."
                   value={eventTitle}
                   onChange={(e) => setEventTitle(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-700"
+                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-500 font-bold uppercase block">Start Time *</label>
+                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Start Time *</label>
                 <input 
                   type="datetime-local" 
                   required
                   value={eventStart}
                   onChange={(e) => setEventStart(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-500 font-bold uppercase block">End Time *</label>
+                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">End Time *</label>
                 <input 
                   type="datetime-local" 
                   required
                   value={eventEnd}
                   onChange={(e) => setEventEnd(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-500 font-bold uppercase block">Guests (comma-separated)</label>
+                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Guests (comma-separated)</label>
                 <input 
                   type="text" 
                   placeholder="e.g. john@domain.com, team@locus.co"
                   value={eventGuests}
                   onChange={(e) => setEventGuests(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-700"
+                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
                 />
               </div>
 
               {eventStatus && (
                 <div className={`p-2.5 rounded-lg border text-[11px] leading-relaxed ${
                   eventStatus.type === "success" 
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-                    : "bg-red-500/10 border-red-500/20 text-red-400"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                    : "bg-destructive/10 border-destructive/20 text-destructive"
                 }`}>
                   {eventStatus.message}
                 </div>
@@ -1271,7 +1271,7 @@ export function WorkspaceClient({
                 type="submit"
                 disabled={eventCreating}
                 size="xs"
-                className="w-full bg-zinc-100 text-zinc-950 hover:bg-zinc-200 text-xs py-1.5 font-bold rounded-lg flex items-center justify-center gap-1"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs py-1.5 font-bold rounded-lg flex items-center justify-center gap-1 cursor-pointer animate-in fade-in"
               >
                 {eventCreating ? (
                   <>
@@ -1280,7 +1280,7 @@ export function WorkspaceClient({
                   </>
                 ) : (
                   <>
-                    <Calendar className="h-3.5 w-3.5 text-zinc-950" />
+                    <Calendar className="h-3.5 w-3.5 text-primary-foreground" />
                     <span>Post Event</span>
                   </>
                 )}
