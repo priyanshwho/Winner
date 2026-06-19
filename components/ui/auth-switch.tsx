@@ -39,68 +39,20 @@ export function AuthSwitch({ callbackUrl }: AuthSwitchProps) {
   };
 
   return (
-    <Card className="border border-border/40 bg-card/65 backdrop-blur-xl shadow-2xl sm:rounded-2xl transition-all duration-300 hover:border-border/60">
+    <Card className="border border-white/10 dark:border-white/5 bg-white/5 dark:bg-black/20 backdrop-blur-3xl shadow-2xl sm:rounded-2xl transition-all duration-300 hover:border-white/20 dark:hover:border-white/10">
       <CardHeader className="space-y-4 text-center pt-8">
         <CardTitle className="text-4xl font-semibold tracking-tight font-serif text-foreground">
-          Locus
+          ARGON AI
         </CardTitle>
-        
-        {/* Sliding Premium Tab Switch */}
-        <div className="relative flex p-1.5 bg-muted/50 dark:bg-muted/20 border border-border/20 rounded-full w-full max-w-[240px] mx-auto">
-          {/* Active Tab Sliding Background */}
-          <motion.div
-            className="absolute inset-y-1.5 rounded-full bg-background dark:bg-zinc-800 border border-border/30 shadow-xs"
-            layoutId="activeTabIndicator"
-            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            style={{
-              width: "calc(50% - 12px)",
-              left: activeTab === "signin" ? "6px" : "calc(50% + 6px)"
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={() => handleTabChange("signin")}
-            className={`relative z-10 w-1/2 py-1.5 text-xs font-medium rounded-full cursor-pointer transition-colors duration-200 ${
-              activeTab === "signin" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Sign In
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleTabChange("signup")}
-            className={`relative z-10 w-1/2 py-1.5 text-xs font-medium rounded-full cursor-pointer transition-colors duration-200 ${
-              activeTab === "signup" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Sign Up
-          </button>
-        </div>
-
         <CardDescription className="text-muted-foreground text-sm max-w-[280px] mx-auto">
           {activeTab === "signin" 
-            ? "Welcome back. Choose your login method."
+            ? "Welcome back. Enter your credentials."
             : "Create an account to manage Gmail and Calendar."
           }
         </CardDescription>
       </CardHeader>
       
       <CardContent className="grid gap-6">
-        <OAuthSignIn callbackUrl={callbackUrl} />
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border/40" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              {activeTab === "signin" ? "Or continue with email" : "Or sign up with email"}
-            </span>
-          </div>
-        </div>
-
         {/* Tab Forms Content with Fade Animation */}
         <div className="relative min-h-[220px]">
           <AnimatePresence mode="wait">
@@ -119,6 +71,43 @@ export function AuthSwitch({ callbackUrl }: AuthSwitchProps) {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Centered Switch Link */}
+        <div className="text-center text-sm text-muted-foreground">
+          {activeTab === "signin" ? (
+            <>
+              Don't have an account?{" "}
+              <button
+                onClick={() => handleTabChange("signup")}
+                className="text-primary hover:underline font-medium cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
+              >
+                Create account
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button
+                onClick={() => handleTabChange("signin")}
+                className="text-primary hover:underline font-medium cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
+              >
+                Login
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Separator Line */}
+        <div className="flex items-center gap-4">
+          <div className="h-[1px] flex-1 bg-border/20" />
+          <span className="text-xs uppercase text-muted-foreground shrink-0">
+            {activeTab === "signin" ? "Or continue with" : "Or sign up with"}
+          </span>
+          <div className="h-[1px] flex-1 bg-border/20" />
+        </div>
+
+        {/* OAuth Buttons at the bottom */}
+        <OAuthSignIn callbackUrl={callbackUrl} />
       </CardContent>
     </Card>
   );

@@ -19,8 +19,12 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({
-      hasGmail: accounts.some((a) => a.integration.name === "gmail"),
-      hasCalendar: accounts.some((a) => a.integration.name === "googlecalendar"),
+      hasGmail: accounts.some(
+        (a) => a.integration.name === "gmail" && !!(a.config as Record<string, unknown>)?.access_token
+      ),
+      hasCalendar: accounts.some(
+        (a) => a.integration.name === "googlecalendar" && !!(a.config as Record<string, unknown>)?.access_token
+      ),
     });
   } catch (err) {
     console.error('Failed to query integration status:', err);

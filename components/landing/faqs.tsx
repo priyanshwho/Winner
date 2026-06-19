@@ -34,7 +34,7 @@ export default function FAQs() {
   };
 
   return (
-    <section id="faqs" className="py-32 md:py-40 border-t border-border bg-background text-foreground relative">
+    <section id="faqs" className="min-h-screen flex flex-col justify-center py-20 border-t border-border bg-background text-foreground relative">
       <div className="mx-auto max-w-4xl px-6 sm:px-8 lg:px-12">
         <div className="text-center space-y-5 mb-20 md:mb-24">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-serif text-foreground tracking-tight uppercase leading-tight">

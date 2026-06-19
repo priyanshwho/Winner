@@ -46,11 +46,21 @@ export default async function SettingsPage() {
     include: { integration: true },
   });
 
-  const hasGmail = accounts.some((a) => a.integration.name === "gmail");
-  const hasCalendar = accounts.some((a) => a.integration.name === "googlecalendar");
+  // An account row is created during plugin *setup*, but config is only populated
+  // after the user completes the OAuth flow. Check for a real access_token.
+  const hasGmail = accounts.some(
+    (a) => a.integration.name === "gmail" && !!(a.config as Record<string, unknown>)?.access_token
+  );
+  const hasCalendar = accounts.some(
+    (a) => a.integration.name === "googlecalendar" && !!(a.config as Record<string, unknown>)?.access_token
+  );
 
-  const gmailAccount = accounts.find((a) => a.integration.name === "gmail");
-  const calendarAccount = accounts.find((a) => a.integration.name === "googlecalendar");
+  const gmailAccount = accounts.find(
+    (a) => a.integration.name === "gmail" && !!(a.config as Record<string, unknown>)?.access_token
+  );
+  const calendarAccount = accounts.find(
+    (a) => a.integration.name === "googlecalendar" && !!(a.config as Record<string, unknown>)?.access_token
+  );
 
   // 2. Fetch direct Corsair DB synced counts
   let emailCount = 0;

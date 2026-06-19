@@ -87,7 +87,7 @@ export function CredentialSignUp({ callbackUrl }: CredentialSignUpProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={loading}
-            className="pl-10 h-11 border-border bg-background focus-visible:ring-1"
+            className="pl-10 h-11 border-border/10 bg-white/[0.03] dark:bg-black/10 backdrop-blur-md focus-visible:ring-1"
             required
             autoComplete="name"
           />
@@ -105,7 +105,7 @@ export function CredentialSignUp({ callbackUrl }: CredentialSignUpProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className="pl-10 h-11 border-border bg-background focus-visible:ring-1"
+            className="pl-10 h-11 border-border/10 bg-white/[0.03] dark:bg-black/10 backdrop-blur-md focus-visible:ring-1"
             required
             autoComplete="email"
           />
@@ -123,7 +123,7 @@ export function CredentialSignUp({ callbackUrl }: CredentialSignUpProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            className="pl-10 pr-10 h-11 border-border bg-background focus-visible:ring-1"
+            className="pl-10 pr-10 h-11 border-border/10 bg-white/[0.03] dark:bg-black/10 backdrop-blur-md focus-visible:ring-1"
             required
             autoComplete="new-password"
           />

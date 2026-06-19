@@ -140,3 +140,39 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* Testimonials Column Vertical Scrolling Animation */
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.testimonial-scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  animation: scrollUp var(--scroll-duration, 15s) linear infinite;
+  will-change: transform;
+}
+
+/* Pause the animation of the scroll container when the column is hovered */
+.testimonial-column-parent:hover .testimonial-scroll-container {
+  animation-play-state: paused;
+}
+
+/* Card Hover Border Glow for Testimonial Cards */
+.testimonial-card-glow {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.testimonial-card-glow:hover {
+  border-color: rgba(196, 30, 58, 0.6); /* --primary: #c41e3a */
+  box-shadow: 0 0 25px rgba(196, 30, 58, 0.25);
+  background-color: var(--card);
+}

@@ -84,7 +84,7 @@ export function OAuthSignIn({ callbackUrl }: OAuthSignInProps) {
         <Button
           type="submit"
           variant="outline"
-          className="w-full flex items-center justify-center cursor-pointer py-5 border-border hover:bg-muted/50"
+          className="w-full flex items-center justify-center cursor-pointer py-5 border-border/20 bg-background/20 dark:bg-background/15 backdrop-blur-xs hover:bg-background/40 dark:hover:bg-background/30"
           disabled={loadingProvider !== null}
         >
           {loadingProvider === "google" ? (
@@ -101,7 +101,7 @@ export function OAuthSignIn({ callbackUrl }: OAuthSignInProps) {
         <Button
           type="submit"
           variant="outline"
-          className="w-full flex items-center justify-center cursor-pointer py-5 border-border hover:bg-muted/50"
+          className="w-full flex items-center justify-center cursor-pointer py-5 border-border/20 bg-background/20 dark:bg-background/15 backdrop-blur-xs hover:bg-background/40 dark:hover:bg-background/30"
           disabled={loadingProvider !== null}
         >
           {loadingProvider === "github" ? (

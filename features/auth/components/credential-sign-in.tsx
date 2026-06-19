@@ -80,7 +80,7 @@ export function CredentialSignIn({ callbackUrl }: CredentialSignInProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className="pl-10 h-11 border-border bg-background focus-visible:ring-1"
+            className="pl-10 h-11 border-border/10 bg-white/[0.03] dark:bg-black/10 backdrop-blur-md focus-visible:ring-1"
             required
             autoComplete="email"
           />
@@ -100,7 +100,7 @@ export function CredentialSignIn({ callbackUrl }: CredentialSignInProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            className="pl-10 pr-10 h-11 border-border bg-background focus-visible:ring-1"
+            className="pl-10 pr-10 h-11 border-border/10 bg-white/[0.03] dark:bg-black/10 backdrop-blur-md focus-visible:ring-1"
             required
             autoComplete="current-password"
           />

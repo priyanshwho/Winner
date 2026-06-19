@@ -565,7 +565,7 @@ export function WorkspaceClient({
               </div>
               {!sidebarCollapsed && (
                 <span className="text-lg font-bold font-serif tracking-tight text-foreground transition-opacity duration-300">
-                  Locus
+                  ArgonAI
                 </span>
               )}
             </div>
@@ -878,7 +878,7 @@ export function WorkspaceClient({
                         </div>
                         <div className="rounded-2xl px-4 py-2 bg-card border border-border/50 text-muted-foreground text-[11px] flex items-center gap-2">
                           <RefreshCw className="h-3 w-3 animate-spin text-muted-foreground/60" />
-                          <span>Locus is thinking...</span>
+                          <span>Argon is On it...</span>
                         </div>
                       </div>
                     )}
@@ -1082,7 +1082,7 @@ export function WorkspaceClient({
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-xs text-muted-foreground leading-relaxed min-h-[40px] flex items-center">
-                      Authorizes Atria's sync agent to read, organize, and build index caches for your Gmail correspondence.
+                      Authorizes ArgonAI's sync agent to read, organize, and build index caches for your Gmail correspondence.
                     </p>
                     <div className="flex items-center justify-between pt-2">
                       {initialHasGmail ? (

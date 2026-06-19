@@ -56,24 +56,14 @@ export default function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="py-32 md:py-40 border-t border-border bg-background text-foreground relative overflow-hidden">
+    <section id="pricing" className="min-h-screen flex flex-col justify-center py-10 md:py-12 border-t border-border bg-background text-foreground relative overflow-hidden">
       {/* Background glow decoration */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12 relative z-10">
         
         {/* Credit Card Hero Hover Visual */}
-        <div className="mb-28 flex justify-center">
-          <CreditCardHero
-            headline="Zero-Knowledge Secure Billing"
-            subtext="All sync credentials and database secrets are encrypted locally. Upgrade securely to experience the premium features of ARGON AI."
-            cta="Explore Plans Below"
-            onCtaClick={() => document.getElementById("plans-comparison-anchor")?.scrollIntoView({ behavior: "smooth" })}
-            primaryCardImage="/argon_black_card.png"
-            secondaryCardImage="/argon_crimson_card.png"
-            className="w-full max-w-4xl border border-border/60 bg-card/35 backdrop-blur-[8px] rounded-3xl"
-          />
-        </div>
+      
 
         <div id="plans-comparison-anchor" className="scroll-mt-32">
           <CreativePricing

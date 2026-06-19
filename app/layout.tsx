@@ -25,7 +25,7 @@ const sarala = Sarala({
 });
 
 export const metadata: Metadata = {
-  title: "Locus — AI Command Center",
+  title: "ARGON — AI Command Center",
   description: "AI-powered command center for Gmail and Google Calendar",
 };
 

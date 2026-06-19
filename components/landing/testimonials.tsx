@@ -48,27 +48,27 @@ export default function Testimonials() {
   const thirdColumn = [testimonials[4], testimonials[5]];
 
   return (
-    <section id="testimonials" className="py-32 md:py-40 border-t border-border bg-background text-foreground relative overflow-hidden">
+    <section id="testimonials" className="min-h-screen flex flex-col justify-center py-10 md:py-12 border-t border-border bg-background text-foreground relative overflow-hidden">
       {/* Glow effect */}
       <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
-        <div className="text-center space-y-5 mb-20 md:mb-24">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-serif text-foreground tracking-tight uppercase leading-tight">
+        <div className="text-center space-y-3 mb-8 md:mb-10">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold font-serif text-foreground tracking-tight uppercase leading-tight">
             Testimonials
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-sans leading-relaxed">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto font-sans leading-relaxed">
             Hear from teams streamlining their workspace operations with ARGON AI.
           </p>
         </div>
 
         {/* Scrolling Columns Container */}
-        <div className="relative h-[650px] overflow-hidden rounded-3xl border border-border/40 bg-card/10 px-4 md:px-8 py-6">
+        <div className="relative h-[420px] md:h-[450px] overflow-hidden rounded-2xl border border-border/40 bg-card/10 px-4 md:px-8 py-4">
           {/* Top and Bottom Fade Masks */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background via-background/90 to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background via-background/90 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-background via-background/90 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/90 to-transparent z-10" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center h-full">
             <TestimonialsColumn 
               testimonials={firstColumn} 
               duration={16} 

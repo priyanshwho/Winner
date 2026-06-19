@@ -5,7 +5,7 @@ import { ArrowRight, Play } from "lucide-react";
 
 export default function CTA() {
   return (
-    <section className="py-32 md:py-44 border-t border-border bg-background text-foreground relative overflow-hidden">
+    <section className="min-h-screen flex flex-col justify-center py-20 border-t border-border bg-background text-foreground relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[450px] w-[450px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 

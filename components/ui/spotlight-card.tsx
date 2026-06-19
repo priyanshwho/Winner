@@ -34,7 +34,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
   customSize = false
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const syncPointer = (e: PointerEvent) => {
@@ -68,12 +67,10 @@ const GlowCard: React.FC<GlowCardProps> = ({
       '--spread': spread,
       '--saturation': saturation,
       '--lightness': lightness,
-      '--border': '1.5',
       '--backdrop': 'rgba(12, 10, 9, 0.03)',
-      '--backup-border': 'var(--border)',
       '--size': '250',
       '--outer': '1',
-      '--border-size': 'calc(var(--border, 1.5) * 1px)',
+      '--border-size': '1px',
       '--spotlight-size': 'calc(var(--size, 250) * 1px)',
       '--hue': 'calc(var(--base) + (var(--xp, 0) * var(--spread, 0)))',
       backgroundImage: `radial-gradient(
@@ -85,7 +82,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
       backgroundSize: 'calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)))',
       backgroundPosition: '50% 50%',
       backgroundAttachment: 'fixed',
-      border: 'var(--border-size) solid var(--backup-border)',
       position: 'relative' as const,
       touchAction: 'none' as const,
     };
@@ -106,6 +102,11 @@ const GlowCard: React.FC<GlowCardProps> = ({
       --border-spot-opacity: 0;
       --bg-spot-opacity: 0;
       transition: --border-spot-opacity 0.4s ease, --bg-spot-opacity 0.4s ease;
+      --backup-border: rgba(197, 191, 184, 0.85);
+    }
+    
+    .dark [data-glow] {
+      --backup-border: rgba(255, 255, 255, 0.15);
     }
     
     [data-glow]:hover {
@@ -113,75 +114,49 @@ const GlowCard: React.FC<GlowCardProps> = ({
       --bg-spot-opacity: 0.15;
     }
 
-    /* Outer card border glow (cherry color only) */
+    /* Static background border (always visible) */
     [data-glow]::before {
       pointer-events: none;
       content: "";
       position: absolute;
-      inset: calc(var(--border-size) * -1);
+      inset: 0;
+      border: var(--border-size) solid var(--backup-border);
+      border-radius: inherit;
+      box-sizing: border-box;
+      opacity: 1;
+    }
+
+    /* Hover spotlight border glow (cherry color only) */
+    [data-glow]::after {
+      pointer-events: none;
+      content: "";
+      position: absolute;
+      inset: 0;
       border: var(--border-size) solid transparent;
       border-radius: inherit;
+      box-sizing: border-box;
+      
+      mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+
       background-attachment: fixed;
       background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
       background-repeat: no-repeat;
       background-position: 50% 50%;
-      mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.4s ease;
       background-image: radial-gradient(
         calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
         calc(var(--x, 0) * 1px)
         calc(var(--y, 0) * 1px),
-        hsl(var(--hue, 210) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%) / var(--border-spot-opacity, 1)), transparent 100%
+        hsl(var(--hue, 210) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%)), transparent 100%
       );
-      filter: brightness(1.2);
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
     
-    [data-glow]:hover::before {
+    [data-glow]:hover::after {
       opacity: 1;
-    }
-    
-    /* Inner element for blurred background glow aura */
-    [data-glow] [data-glow-inner] {
-      position: absolute;
-      inset: 0;
-      will-change: filter;
-      opacity: var(--outer, 1);
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    
-    [data-glow] [data-glow-inner]::before {
-      pointer-events: none;
-      content: "";
-      position: absolute;
-      inset: -15px;
-      border: 15px solid transparent;
-      border-radius: inherit;
-      background-attachment: fixed;
-      background-size: calc(100% + 30px) calc(100% + 30px);
-      background-repeat: no-repeat;
-      background-position: 50% 50%;
-      mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      background-image: radial-gradient(
-        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
-        calc(var(--x, 0) * 1px)
-        calc(var(--y, 0) * 1px),
-        hsl(var(--hue, 210) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%) / var(--border-spot-opacity, 1)), transparent 100%
-      );
-      filter: blur(15px) brightness(1.2);
-    }
-    
-    [data-glow]:hover [data-glow-inner]::before {
-      opacity: 0.6;
     }
   `;
 
@@ -202,7 +177,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
           ${className}
         `}
       >
-        <div ref={innerRef} data-glow-inner></div>
         {children}
       </div>
     </>

@@ -9,7 +9,7 @@ dns.setDefaultResultOrder("ipv4first");
 
 async function runTestHarness() {
   console.log("=================================================");
-  console.log("       ATRIA AI INTEGRATION TEST HARNESS        ");
+  console.log("      ARGONAI AI INTEGRATION TEST HARNESS        ");
   console.log("=================================================");
 
   // 1. Verify GOOGLE_GENERATIVE_AI_API_KEY
@@ -41,7 +41,7 @@ async function runTestHarness() {
   try {
     const result = await generateText({
       model,
-      system: "You are Atria, a helpful workspace assistant with access to Gmail and Google Calendar tools.",
+      system: "You are ArgonAI, a helpful workspace assistant with access to Gmail and Google Calendar tools.",
       prompt: "List the subject line of my last 2 emails",
       tools,
       stopWhen: stepCountIs(5),

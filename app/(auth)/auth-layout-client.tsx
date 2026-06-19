@@ -3,18 +3,19 @@
 import Link from "next/link";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { ArrowLeft } from "lucide-react";
+import { CherryBlossom } from "@/components/ui/cherry-blossom";
 
 export default function AuthLayoutClient({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-svh w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-12 transition-colors duration-300 auth-page-container">
       {/* Blurred Hero Background Image */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat filter blur-[12px] scale-[1.05] pointer-events-none opacity-80" 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat filter blur-[12px] scale-[1.05] pointer-events-none opacity-90" 
         style={{ backgroundImage: "url('/hero.png')" }} 
       />
       
       {/* Dynamic Theme color overlay */}
-      <div className="absolute inset-0 z-0 bg-background/80 dark:bg-background/85 transition-colors duration-300 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-background/10 dark:bg-background/25 transition-colors duration-300 pointer-events-none" />
 
       {/* Premium Background Grid */}
       <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,rgba(128,128,128,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(128,128,128,0.06)_1px,transparent_1px)] bg-[size:32px_32px] opacity-70 dark:opacity-30 pointer-events-none" />
@@ -41,12 +42,15 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
         />
       </div>
 
+      {/* Falling Cherry Blossoms Background Animation */}
+      <CherryBlossom />
+
       {/* Embedded CSS Animations & Theme Variables */}
       <style jsx global>{`
         .auth-page-container {
           --background: #f5f1eb;
           --foreground: #0c0a09;
-          --card: #f5f1eb;
+          --card: rgba(245, 241, 235, 0.12);
           --card-foreground: #0c0a09;
           --popover: #f5f1eb;
           --popover-foreground: #0c0a09;
@@ -69,7 +73,7 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
         .dark .auth-page-container {
           --background: #0c0a09;
           --foreground: #f5f1eb;
-          --card: #0c0a09;
+          --card: rgba(12, 10, 9, 0.2);
           --card-foreground: #f5f1eb;
           --popover: #0c0a09;
           --popover-foreground: #f5f1eb;
@@ -108,7 +112,7 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
           className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1.5 px-3 rounded-full hover:bg-muted/40 border border-transparent hover:border-border/30"
         >
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-          <span>Back to Locus</span>
+          <span>Back to ARGON AI</span>
         </Link>
 
         <div className="flex items-center justify-center rounded-full border border-border/30 bg-background/50 p-1 backdrop-blur-xs">

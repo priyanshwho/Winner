@@ -61,6 +61,14 @@ export async function POST(req: Request) {
     }
   }
 
+  // Check if Gmail and Google Calendar integrations are configured
+  const accounts = await prisma.corsairAccount.findMany({
+    where: { tenantId: session.user.id },
+    include: { integration: true },
+  });
+  const hasGmail = accounts.some((a) => a.integration.name === "gmail");
+  const hasCalendar = accounts.some((a) => a.integration.name === "googlecalendar");
+
   const aiTools = getCorsairAiTools(session.user.id);
   const coreMessages = (messages || []).map((m: any) => ({
     role: m.role,
@@ -71,10 +79,24 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model,
-    system: `You are Atria, an AI-powered workspace assistant.
+    system: `You are ArgonAI, an AI-powered workspace assistant.
 You manage the user's Gmail and Google Calendar.
 You can read their emails, draft responses, find calendar availability, and schedule meetings.
 Be concise, helpful, and professional.
+
+${(!hasGmail || !hasCalendar) ? `
+CRITICAL: Gmail and/or Google Calendar integrations are not configured for this user.
+- Gmail Connected: ${hasGmail ? 'YES' : 'NO'}
+- Google Calendar Connected: ${hasCalendar ? 'YES' : 'NO'}
+
+If the user asks "do I need to configure the gmail and calendar?" or asks about setup, or if you run into connection/missing credentials errors, you MUST reply with this exact information:
+"You have to setup the Gmail and Google Calendar configuration. In the sidebar, there is a configuration button. Click on that, and there is a page having Gmail and Google Calendar to configure. Follow the steps to configure the Gmail and Google Calendar."
+
+Do not provide manual command line setup instructions or OAuth script code. Simply direct the user to the configuration button in the sidebar.
+` : `
+If the user asks "do I need to configure the gmail and calendar?", you should confirm they are already configured, but if they ever ask how to configure them or need to re-configure, direct them by replying:
+"You have to setup the Gmail and Google Calendar configuration. In the sidebar, there is a configuration button. Click on that, and there is a page having Gmail and Google Calendar to configure. Follow the steps to configure the Gmail and Google Calendar."
+`}
 
 To fetch and modify emails and calendar events, you MUST use the "run_script" tool.
 The "run_script" tool takes a JavaScript code string to execute.
