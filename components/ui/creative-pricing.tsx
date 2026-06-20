@@ -26,12 +26,12 @@ function CreativePricing({
 }) {
     return (
         <div className="w-full max-w-5xl mx-auto px-4">
-            <div className="text-center space-y-3 mb-8 md:mb-10">
-                <div className="font-mono text-xs tracking-wider uppercase text-primary rotate-[-1deg]">
+            <div className="text-center space-y-3.5 mb-9 md:mb-11">
+                <div className="font-mono text-[13px] tracking-wider uppercase text-primary rotate-[-1deg]">
                     {tag}
                 </div>
                 <div className="relative">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold font-serif text-foreground rotate-[-1deg] uppercase leading-tight tracking-tight">
+                    <h2 className="text-[33px] md:text-[44px] lg:text-[55px] font-extrabold font-serif text-foreground rotate-[-1deg] uppercase leading-tight tracking-tight">
                         {title}
                     </h2>
                     <div
@@ -39,12 +39,12 @@ function CreativePricing({
                         rotate-[-1deg] rounded-full blur-sm"
                     />
                 </div>
-                <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto font-sans leading-relaxed rotate-[-1deg]">
+                <p className="text-[17px] md:text-[19px] text-muted-foreground max-w-2xl mx-auto font-sans leading-relaxed rotate-[-1deg]">
                     {description}
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[22px] md:gap-[26px]">
                 {tiers.map((tier, index) => (
                     <div
                         key={tier.name}
@@ -59,16 +59,25 @@ function CreativePricing({
                         <div
                             className={cn(
                                 "absolute inset-0 bg-card/65 dark:bg-card/45 backdrop-blur-[5px]",
-                                "border-2 border-border group-hover:border-primary/50",
-                                "rounded-2xl shadow-[6px_6px_0px_0px] shadow-primary/10 dark:shadow-primary/5",
-                                "transition-all duration-300",
-                                "group-hover:shadow-[10px_10px_0px_0px] group-hover:shadow-primary/20 dark:group-hover:shadow-primary/10",
+                                tier.name === "Pro Plan"
+                                    ? "border-2 border-[#c41e3a] group-hover:border-[#c41e3a]"
+                                    : "border-2 border-border group-hover:border-primary/50",
+                                "rounded-2xl transition-all duration-300",
+                                tier.name === "Pro Plan"
+                                    ? [
+                                        "shadow-[6px_6px_0px_0px] shadow-[#c41e3a]/15 dark:shadow-[#c41e3a]/10",
+                                        "group-hover:shadow-[10px_10px_0px_0px] group-hover:shadow-[#c41e3a]/30 dark:group-hover:shadow-[#c41e3a]/20"
+                                      ]
+                                    : [
+                                        "shadow-[6px_6px_0px_0px] shadow-primary/10 dark:shadow-primary/5",
+                                        "group-hover:shadow-[10px_10px_0px_0px] group-hover:shadow-primary/20 dark:group-hover:shadow-primary/10"
+                                      ],
                                 "group-hover:translate-x-[-4px]",
                                 "group-hover:translate-y-[-4px]"
                             )}
                         />
 
-                        <div className="relative p-5 md:p-6 flex flex-col justify-between h-full min-h-[360px] md:min-h-[390px]">
+                        <div className="relative p-[22px] md:p-[26px] flex flex-col justify-between h-full min-h-[396px] md:min-h-[429px]">
                             {tier.popular && (
                                 <div
                                     className="absolute -top-2.5 -right-2.5 bg-primary text-primary-foreground 
@@ -81,10 +90,10 @@ function CreativePricing({
                             <div>
                                 <div className="mb-4 flex justify-between items-start">
                                     <div>
-                                        <h3 className="font-serif text-xl font-bold uppercase text-foreground tracking-wide">
+                                        <h3 className="font-serif text-[23px] font-bold uppercase text-foreground tracking-wide">
                                             {tier.name}
                                         </h3>
-                                        <p className="font-sans text-xs text-muted-foreground mt-0.5">
+                                        <p className="font-sans text-[13px] text-muted-foreground mt-0.5">
                                             {tier.description}
                                         </p>
                                     </div>
@@ -100,31 +109,31 @@ function CreativePricing({
 
                                 {/* Price */}
                                 <div className="mb-4 flex items-baseline">
-                                    <span className="text-3xl md:text-4xl font-extrabold text-foreground font-serif tracking-tight">
+                                    <span className="text-[33px] md:text-[44px] font-extrabold text-foreground font-serif tracking-tight">
                                         {tier.price}
                                     </span>
                                     {tier.price !== "Contact Us" && (
-                                        <span className="text-muted-foreground font-mono text-xs ml-1.5">
+                                        <span className="text-muted-foreground font-mono text-[13px] ml-1.5">
                                             {tier.price.includes("forever") ? "" : "/month"}
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="space-y-2 mb-6">
+                                <div className="space-y-[9px] mb-[26px]">
                                     {tier.features.map((feature) => (
                                         <div
                                             key={feature}
-                                            className="flex items-start gap-2.5"
+                                            className="flex items-start gap-[11px]"
                                         >
                                             <div
                                                 className={cn(
-                                                    "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5",
+                                                    "w-[18px] h-[18px] rounded-full border flex items-center justify-center shrink-0 mt-0.5",
                                                     tier.popular ? "border-primary/40 text-primary" : "border-border text-muted-foreground"
                                                 )}
                                             >
-                                                <Check className="w-2.5 h-2.5" />
+                                                <Check className="w-3 h-3" />
                                             </div>
-                                            <span className="font-sans text-xs md:text-sm text-foreground/90 leading-snug">
+                                            <span className="font-sans text-[13px] md:text-[15px] text-foreground/90 leading-snug">
                                                 {feature}
                                             </span>
                                         </div>

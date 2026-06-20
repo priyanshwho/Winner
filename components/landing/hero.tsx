@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section className="relative pt-24 pb-20 sm:pt-32 sm:pb-28 overflow-hidden bg-zinc-950 text-white">
       {/* Arkham background glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 h-[600px] w-full max-w-7xl opacity-20 blur-[130px] pointer-events-none">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 h-[600px] w-full max-w-7xl opacity-[0] dark:opacity-[0.90] blur-md dark:blur-[130px] pointer-events-none">
         <div className="absolute top-[-10%] left-[10%] h-[350px] w-[350px] rounded-full bg-gradient-to-r from-amber-600 to-yellow-500"></div>
         <div className="absolute top-[20%] right-[10%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-[#111827] to-[#f59e0b]"></div>
       </div>

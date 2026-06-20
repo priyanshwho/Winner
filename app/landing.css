@@ -1,6 +1,3 @@
-@import url("https://fonts.cdnfonts.com/css/pp-neue-montreal");
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
-
 .landing-page-container {
   --base-100: #fff;
   --base-200: #f5f1eb;
@@ -14,10 +11,13 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 .landing-page-container.loaded {
   height: auto;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
 }
 
 .dark .landing-page-container {
@@ -140,8 +140,9 @@
   padding: 2rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  z-index: 10;
+  align-items: center;
+  /* Must be above all section-stack-wrappers (max z-index 7) */
+  z-index: 200;
 }
 
 .landing-page-container .nav-links {
@@ -156,14 +157,24 @@
 
 .landing-page-container .hero {
   position: relative;
+  z-index: 1;
   width: 100%;
   height: 100svh;
-  background-image: url('/hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   color: var(--base-300);
   overflow: hidden;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .landing-page-container .hero {
+    position: sticky;
+    top: 0;
+  }
 }
 
 .landing-page-container .hero::before {
@@ -178,12 +189,11 @@
 }
 
 .landing-page-container .header {
-  position: absolute;
-  top: 40%;
-  left: 50%;
+  position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  transform: translate(-50%, -50%);
   width: 100%;
   height: max-content;
   overflow: hidden;
@@ -193,15 +203,13 @@
 .landing-page-container .header h1 {
   font-family: 'Audiowide', cursive;
   text-transform: uppercase;
-  font-size: clamp(2.5rem, 15vw, 25rem);
-  line-height: 0.85;
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
 }
 
 .landing-page-container .hero-sub {
-  position: absolute;
-  top: 58%;
-  left: 50%;
-  transform: translate(-50%, 0);
+  position: relative;
   width: 100%;
   z-index: 3;
   display: flex;
@@ -260,20 +268,24 @@
   overflow: hidden;
   display: inline-block;
   cursor: pointer;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
-.nav-link-text,
-.nav-link-text-clone {
+.nav-link-text {
   display: block;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 .nav-link-text-clone {
+  display: block;
   position: absolute;
-  top: 100%;
+  top: 0;
   left: 0;
   right: 0;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
   color: var(--base-accent); /* Red in dark mode / hover */
 }
 
@@ -282,7 +294,7 @@
 }
 
 .nav-link-container:hover .nav-link-text-clone {
-  transform: translateY(-100%);
+  transform: translateY(0);
 }
 
 /* Arkham Sign Up button */
@@ -295,6 +307,79 @@
   border-radius: 9999px;
   position: relative;
   overflow: hidden;
+}
+
+/* Batman badge dot pulse */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #0ad000;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-green 1.8s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(10, 208, 0, 0.8);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(10, 208, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(10, 208, 0, 0);
+  }
+}
+
+/* Arkham style Get Started Button */
+.landing-page-container .get-started-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  font-family: "PP Neue Montreal", sans-serif !important;
+  font-weight: 500 !important;
+  padding: 0.8em 2.4em !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+  background-color: #0c0a09 !important;
+  border-radius: 50px !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+  z-index: 20 !important;
+  transition: all 0.3s ease !important;
+  border: 2px solid var(--base-accent) !important;
+  backdrop-filter: blur(1px) !important;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(196, 30, 58, 0.25) !important;
+}
+
+.landing-page-container .get-started-btn::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    -60deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  ) !important;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  z-index: -1 !important;
+  filter: blur(5px) !important;
+}
+
+.landing-page-container .get-started-btn:hover::before {
+  left: 100% !important;
+}
+
+.landing-page-container .get-started-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 8px 25px rgba(196, 30, 58, 0.45) !important;
 }
 
 .sign-up-btn::after {
@@ -333,4 +418,96 @@
 
 .landing-page-container .header h1:hover {
   color: var(--base-accent);
+}
+
+/* ── Sticky stacking scroll ─────────────────────────────────────────────── */
+/*
+  Hero: position:sticky; z-index:1
+  Each section-stack-wrapper: position:sticky; top:0; z-index 2–7
+  Nav: position:fixed; z-index:200  ← always on top of everything
+
+  As you scroll, each wrapper stacks over the previous section.
+  will-change is intentionally NOT set here — it would create a new
+  compositing context and break background-attachment:fixed used by
+  GlowCard's spotlight hover effect.
+*/
+@media (min-width: 768px) {
+  .section-stack-wrapper {
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* ── Card Lines Background Hover Red Glow ───────────────────────────────── */
+.lines-card-bg {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  filter: blur(1px);
+}
+
+/* Light mode inversion to make white lines display dark */
+.light .lines-card-bg,
+:root:not(.dark) .lines-card-bg {
+  filter: invert(1) blur(1px);
+}
+
+.group:hover .lines-card-bg {
+  opacity: 0.22 !important;
+  filter: blur(1px) drop-shadow(0 0 3px rgba(255, 77, 77, 0.45));
+}
+
+.light .group:hover .lines-card-bg,
+:root:not(.dark) .group:hover .lines-card-bg {
+  filter: invert(1) blur(1px) drop-shadow(0 0 3px rgba(255, 77, 77, 0.45));
+}
+
+/* ── Card Heading Hover Red Glow ────────────────────────────────────────── */
+.lines-card-title {
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.active-faq .lines-card-title {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.dark .active-faq .lines-card-title {
+  color: #ffffff;
+}
+
+.light .active-faq .lines-card-title,
+:root:not(.dark) .active-faq .lines-card-title {
+  color: #0c0a09;
+}
+
+.group:hover .lines-card-title {
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.8) !important;
+}
+
+.dark .group:hover .lines-card-title {
+  color: #ffffff !important;
+}
+
+.light .group:hover .lines-card-title,
+:root:not(.dark) .group:hover .lines-card-title {
+  color: #0c0a09 !important;
+}
+
+/* Custom Font Styling for Subhero and Welcome Label */
+.landing-page-container .welcome-label {
+  font-family: 'Audiowide', cursive !important;
+  font-size: clamp(1rem, 2.2vw, 1.8rem) !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.landing-page-container .subhero-text {
+  font-family: 'Istok Web', sans-serif !important;
+  font-size: clamp(1.1rem, 2vw, 1.6rem) !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.01em !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  max-width: 650px !important;
+  text-align: center !important;
 }

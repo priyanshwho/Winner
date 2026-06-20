@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/components/providers/loading-provider";
 import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 import {
   Command,
   CommandDialog,
@@ -559,14 +560,17 @@ export function WorkspaceClient({
         {/* Top Logo and New Chat */}
         <div className="p-4 flex flex-col gap-4 overflow-hidden">
           <div className="flex items-center justify-between px-1 py-1">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-inner shrink-0">
-                <Star className="h-4.5 w-4.5 fill-current text-primary-foreground" />
-              </div>
-              {!sidebarCollapsed && (
-                <span className="text-lg font-bold font-serif tracking-tight text-foreground transition-opacity duration-300">
-                  ArgonAI
-                </span>
+            <div className="flex items-center gap-2 overflow-hidden select-none">
+              {sidebarCollapsed ? (
+                <Link href="/" className="flex items-center shrink-0 justify-center w-12 h-12 overflow-hidden rounded-lg -mt-2">
+                  <img src="/BL-ARGON.png" alt="ARGON AI" className="dark:hidden h-11 max-w-none w-auto object-contain" />
+                  <img src="/WL-ARGON.png" alt="ARGON AI" className="hidden dark:block h-11 max-w-none w-auto object-contain" />
+                </Link>
+              ) : (
+                <Link href="/" className="flex items-center shrink-0 -mt-2">
+                  <img src="/BL-ARGON.png" alt="ARGON AI" className="dark:hidden h-16 w-auto object-contain" />
+                  <img src="/WL-ARGON.png" alt="ARGON AI" className="hidden dark:block h-16 w-auto object-contain" />
+                </Link>
               )}
             </div>
             <button

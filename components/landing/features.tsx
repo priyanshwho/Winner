@@ -33,11 +33,11 @@ export default function Features() {
       {/* Background decoration */}
       <div className="absolute top-0 right-0 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
-      {/* Feature section background image */}
+      {/* Background Image */}
       <div 
-        className="absolute inset-0 z-0 bg-no-repeat bg-cover bg-center opacity-[0.15] dark:opacity-[0.10] pointer-events-none"
+        className="absolute inset-0 z-0 bg-no-repeat bg-cover bg-center opacity-[0.05] dark:opacity-[0.7] pointer-events-none blur-md dark:blur-none"
         style={{ 
-          backgroundImage: "url('/feature-flip-removebg-preview.png')",
+          backgroundImage: "url('/FEATURE-BGM.png')",
         }}
       />
 
@@ -64,23 +64,36 @@ export default function Features() {
                 key={index}
                 customSize
                 glowColor="red"
-                className="rounded-xl bg-card/45 p-6 md:p-8 transition-all hover:bg-card/90 relative group shadow-sm flex flex-col justify-start"
+                className="rounded-xl bg-card/45 p-6 md:p-8 transition-all hover:bg-card/90 relative overflow-hidden group shadow-sm flex flex-col justify-start"
               >
-                <div className="rounded-xl bg-secondary/20 p-3 w-fit text-primary mb-5 shadow-inner group-hover:scale-110 transition-transform">
-                  <IconComponent className="h-6 w-6" />
-                </div>
-                
-                <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 font-serif uppercase tracking-wide">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-xs text-primary/80 mb-4 font-mono">
-                  {feature.subtitle}
-                </p>
+                {/* Lines overlay background inside card */}
+                <div 
+                  className="absolute inset-0 pointer-events-none opacity-[0.10] dark:opacity-[0.06] z-0 lines-card-bg"
+                  style={{
+                    backgroundImage: "url('/lines.png')",
+                    backgroundRepeat: "repeat",
+                    backgroundPosition: "center",
+                    backgroundSize: "150px",
+                  }}
+                />
 
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-sans">
-                  {feature.description}
-                </p>
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="rounded-xl bg-secondary/20 p-3 w-fit text-primary mb-5 shadow-inner group-hover:scale-110 transition-transform">
+                    <IconComponent className="h-6 w-6" />
+                  </div>
+                  
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 font-serif uppercase tracking-wide lines-card-title">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-xs text-primary/80 mb-4 font-mono">
+                    {feature.subtitle}
+                  </p>
+
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-sans">
+                    {feature.description}
+                  </p>
+                </div>
               </GlowCard>
             );
           })}

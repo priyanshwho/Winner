@@ -9,6 +9,14 @@ export default function CTA() {
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[450px] w-[450px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0 bg-no-repeat bg-cover bg-center opacity-[0] dark:opacity-[0.90] pointer-events-none blur-md dark:blur-none"
+        style={{ 
+          backgroundImage: "url('/FOOTER-UP-BGM.png')",
+        }}
+      />
+
       <div className="mx-auto max-w-4xl px-6 sm:px-8 lg:px-12 text-center space-y-10 relative z-10">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-serif uppercase leading-tight">
           Ready to Supercharge<br className="hidden sm:block" /> Your Workspace?

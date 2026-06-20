@@ -55,6 +55,7 @@ export default function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const toggleTheme = useAnimatedThemeToggle();
   const [activeSection, setActiveSection] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
   // Keep toggleTheme in a ref so it never causes the GSAP useEffect to re-run
   const toggleThemeRef = useRef(toggleTheme);
   useEffect(() => { toggleThemeRef.current = toggleTheme; }, [toggleTheme]);
@@ -106,7 +107,7 @@ export default function LandingClient() {
         preloaderEl.style.clipPath = "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)";
         preloaderEl.style.display = "none";
       }
-      containerRef.current.classList.add("loaded");
+      setIsLoaded(true);
 
       // Instantly reveal nav and content without the 5-second wait
       gsap.set(containerRef.current.querySelectorAll(".header h1 .char"), { y: "0%" });
@@ -120,8 +121,7 @@ export default function LandingClient() {
       };
     }
 
-    // Record this visit for cooldown
-    localStorage.setItem(STORAGE_KEY, String(Date.now()));
+
 
     const preloaderImgInitRotations = [7.5, -2.5, -10, 12.5, -5, 5];
 
@@ -141,9 +141,8 @@ export default function LandingClient() {
     const tl = gsap.timeline({
       delay: 0.5,
       onComplete: () => {
-        if (containerRef.current) {
-          containerRef.current.classList.add("loaded");
-        }
+        setIsLoaded(true);
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
       }
     });
 
@@ -308,38 +307,52 @@ export default function LandingClient() {
   }, []); // empty deps — toggleTheme accessed via ref, cooldown from localStorage
 
   useEffect(() => {
-    // Intersection Observer for highlighting active nav link
-    const sections = ["features", "testimonials", "pricing", "faqs"];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the section that is intersecting the most or simply the one currently on screen
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+    // Scroll listener for highlighting active nav link (works forwards and backwards)
+    const handleScroll = () => {
+      const sections = ["features", "testimonials", "pricing", "faqs"];
+      const scrollPosition = window.scrollY + window.innerHeight * 0.45;
+
+      let currentSection = "";
+      
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const wrapper = el.closest(".section-stack-wrapper") || el;
+          const top = (wrapper as HTMLElement).offsetTop;
+          if (scrollPosition >= top) {
+            currentSection = id;
           }
-        });
-      },
-      { rootMargin: "-40% 0px -40% 0px", threshold: 0 }
-    );
+        }
+      }
 
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+      if (window.scrollY < 100) {
+        currentSection = "";
+      }
 
-    return () => observer.disconnect();
+      setActiveSection(currentSection);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const wrapper = element.closest(".section-stack-wrapper") || element;
+      const targetY = (wrapper as HTMLElement).offsetTop;
+      window.scrollTo({
+        top: targetY,
+        behavior: "smooth"
+      });
     }
   };
 
   return (
-    <div ref={containerRef} className="landing-page-container">
+    <div ref={containerRef} className={`landing-page-container ${isLoaded ? "loaded" : ""}`}>
       {/* Preloader Overlay */}
       <div className="preloader">
         <div className="preloader-images">
@@ -372,9 +385,12 @@ export default function LandingClient() {
       </div>
 
       {/* Navigation */}
-      <nav className="font-serif flex items-center justify-between w-full px-8 py-3 z-50 text-black dark:text-foreground">
-        <div className="nav-logo flex items-center h-10">
-          <Link href="/" className="text-2xl md:text-3xl leading-none tracking-tight" style={{ fontFamily: '"Audiowide", cursive' }}>ARGON AI</Link>
+      <nav className="font-serif flex items-center justify-between w-full px-8 py-2 z-50 text-black dark:text-foreground">
+        <div className="nav-logo flex items-center select-none">
+          <Link href="/" className="flex items-center">
+            <img src="/BL-ARGON.png" alt="ARGON AI" className="dark:hidden h-20 md:h-24 w-auto" />
+            <img src="/WL-ARGON.png" alt="ARGON AI" className="hidden dark:block h-20 md:h-24 w-auto" />
+          </Link>
         </div>
 
         {/* Center scrolling links */}
@@ -416,7 +432,7 @@ export default function LandingClient() {
               <span className="nav-link-text-clone">Sign In</span>
             </div>
           </Link>
-          <Link href="/sign-up" className="flex h-10 items-center justify-center px-5 text-sm uppercase tracking-wider font-serif sign-up-btn">
+          <Link href="/sign-up" className="inline-flex h-9 items-center justify-center px-7 text-xs uppercase tracking-wider font-serif sign-up-btn">
             Sign Up <span className="inline-block ml-1">✦</span>
           </Link>
         </div>
@@ -424,6 +440,15 @@ export default function LandingClient() {
 
       {/* Main Hero */}
       <section className="hero">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 z-0 bg-no-repeat bg-cover opacity-[0.3] dark:opacity-[1] pointer-events-none blur-md dark:blur-none"
+          style={{ 
+            backgroundImage: "url('/HERO-BGMM.png')",
+            backgroundPosition: "35% center",
+          }}
+        />
+
         {/* Image Trail Layer (rendered behind text inside the hero section, stacking above z-1 overlay) */}
         <div className="absolute inset-0 z-2 pointer-events-none">
           <ImageTrail containerRef={containerRef as any}>
@@ -460,17 +485,22 @@ export default function LandingClient() {
           </ImageTrail>
         </div>
 
-        <div className="header">
+        {/* 3. Welcome label + Main Header */}
+        <div className="header z-10">
+          <span className="welcome-label text-xs md:text-sm uppercase tracking-[0.3em] text-foreground/60 mb-2 select-none block">Welcome to</span>
           <Link href="/sign-in" className="cursor-pointer">
             <h1>ARGON AI</h1>
           </Link>
         </div>
 
-        <div className="hero-sub">
-          <p>
-            The intelligent command center for your entire digital life. Seamlessly manage emails, calendar events, and tasks all in one place.
+        {/* 4. Subhero description */}
+        <div className="hero-sub z-10 mt-3">
+          <p className="subhero-text text-foreground/90 max-w-3xl leading-relaxed select-none">
+            AI That Doesn&apos;t Just <span className="italic font-bold text-primary">Answer.</span>
+            <br />
+            It <span className="italic font-bold text-primary">Acts.</span>
           </p>
-          <div className="w-full max-w-[600px] h-[160px] flex items-center justify-center relative">
+          <div className="w-full max-w-[600px] h-[150px] flex items-center justify-center relative">
             <PulseBeams
               beams={heroBeams}
               width={600}
@@ -484,24 +514,36 @@ export default function LandingClient() {
               }}
               className="w-full h-full"
             >
-              <Link href="/sign-up" className="flex h-12 items-center justify-center px-10 text-sm uppercase tracking-wider font-bold sign-up-btn rounded-full relative z-20 shadow-[0_0_30px_rgba(196,30,58,0.3)]">
-                Get Started <span className="inline-block ml-1">✦</span>
+              <Link href="/sign-up" className="get-started-btn inline-flex items-center justify-center select-none z-20">
+                ✦ &nbsp; Get Started
               </Link>
             </PulseBeams>
           </div>
         </div>
       </section>
 
-      {/* Additional Page Sections */}
-      <Features />
-      <Testimonials />
-      <Pricing />
-      <FAQs />
-      <CTA />
-      <div className="w-full bg-background text-foreground/30 hover:text-primary transition-colors duration-300 relative z-20">
-        <WavePath className="w-full" />
+      {/* Additional Page Sections — sticky stacking scroll */}
+      <div className="section-stack-wrapper" style={{ zIndex: 2 }}>
+        <Features />
       </div>
-      <Footer />
+      <div className="section-stack-wrapper" style={{ zIndex: 3 }}>
+        <Testimonials />
+      </div>
+      <div className="section-stack-wrapper" style={{ zIndex: 4 }}>
+        <Pricing />
+      </div>
+      <div className="section-stack-wrapper" style={{ zIndex: 5 }}>
+        <FAQs />
+      </div>
+      <div className="section-stack-wrapper" style={{ zIndex: 6 }}>
+        <CTA />
+      </div>
+      <div className="section-stack-wrapper bg-background" style={{ zIndex: 7 }}>
+        <div className="w-full bg-background text-foreground/30 hover:text-primary transition-colors duration-300 relative">
+          <WavePath className="w-full" />
+        </div>
+        <Footer />
+      </div>
     </div>
   );
 }

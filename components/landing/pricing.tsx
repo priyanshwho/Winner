@@ -56,14 +56,19 @@ export default function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="min-h-screen flex flex-col justify-center py-10 md:py-12 border-t border-border bg-background text-foreground relative overflow-hidden">
+    <section id="pricing" className="min-h-screen flex flex-col justify-center py-4 md:py-5 border-t border-border bg-background text-foreground relative overflow-hidden">
       {/* Background glow decoration */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
-      <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12 relative z-10">
-        
-        {/* Credit Card Hero Hover Visual */}
-      
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0 bg-no-repeat bg-cover bg-center opacity-[0] dark:opacity-[0.90] pointer-events-none blur-md dark:blur-none"
+        style={{ 
+          backgroundImage: "url('/price-BGM.png')",
+        }}
+      />
+
+      <div className="mx-auto max-w-6xl px-6 sm:px-9 lg:px-14 relative z-10">
 
         <div id="plans-comparison-anchor" className="scroll-mt-32">
           <CreativePricing

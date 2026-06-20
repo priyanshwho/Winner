@@ -10,14 +10,14 @@ interface BeamPath {
     initial: {
       x1: string;
       x2: string;
-      y1: string;
-      y2: string;
+      y1?: string;
+      y2?: string;
     };
     animate: {
       x1: string | string[];
       x2: string | string[];
-      y1: string | string[];
-      y2: string | string[];
+      y1?: string | string[];
+      y2?: string | string[];
     };
     transition?: {
       duration?: number;
@@ -65,7 +65,7 @@ export const PulseBeams = ({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center antialiased overflow-hidden",
+        "w-full h-screen relative flex items-center justify-center antialiased overflow-hidden",
         className
       )}
     >
@@ -85,7 +85,14 @@ export const PulseBeams = ({
   );
 };
 
-interface SVGsProps {
+const SVGs = ({
+  beams,
+  width,
+  height,
+  baseColor,
+  accentColor,
+  gradientColors
+}: {
   beams: BeamPath[];
   width: number;
   height: number;
@@ -96,16 +103,7 @@ interface SVGsProps {
     middle: string;
     end: string;
   };
-}
-
-const SVGs = ({
-  beams,
-  width,
-  height,
-  baseColor,
-  accentColor,
-  gradientColors,
-}: SVGsProps) => {
+}) => {
   return (
     <svg
       width={width}
@@ -115,7 +113,7 @@ const SVGs = ({
       xmlns="http://www.w3.org/2000/svg"
       className="flex flex-shrink-0"
     >
-      {beams.map((beam, index) => (
+      {beams.map((beam: BeamPath, index: number) => (
         <React.Fragment key={index}>
           <path
             d={beam.path}
@@ -128,7 +126,7 @@ const SVGs = ({
             strokeWidth="2"
             strokeLinecap="round"
           />
-          {beam.connectionPoints?.map((point, pointIndex) => (
+          {beam.connectionPoints?.map((point, pointIndex: number) => (
             <circle
               key={`${index}-${pointIndex}`}
               cx={point.cx}
@@ -142,7 +140,7 @@ const SVGs = ({
       ))}
 
       <defs>
-        {beams.map((beam, index) => (
+        {beams.map((beam: BeamPath, index: number) => (
           <motion.linearGradient
             key={index}
             id={`grad${index}`}
@@ -159,13 +157,11 @@ const SVGs = ({
   );
 };
 
-const GradientColors = ({
-  colors = {
-    start: "#18CCFC",
-    middle: "#6344F5",
-    end: "#AE48FF",
-  },
-}: {
+const GradientColors = ({ colors = {
+  start: "#18CCFC",
+  middle: "#6344F5",
+  end: "#AE48FF"
+} }: {
   colors?: {
     start: string;
     middle: string;

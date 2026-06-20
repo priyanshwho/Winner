@@ -1,19 +1,110 @@
 "use client";
 
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { ArrowLeft } from "lucide-react";
-import { CherryBlossom } from "@/components/ui/cherry-blossom";
+import { PulseBeams } from "@/components/ui/pulse-beams";
 
 export default function AuthLayoutClient({ children }: { children: React.ReactNode }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({
+    width: 1200,
+    height: 800,
+    cardLeft: 376,
+    cardRight: 824,
+    cardTop: 200,
+    cardBottom: 600,
+    cardHeight: 400,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (!cardRef.current) return;
+      const rect = cardRef.current.getBoundingClientRect();
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      setDimensions({
+        width,
+        height,
+        cardLeft: rect.left,
+        cardRight: rect.right,
+        cardTop: rect.top,
+        cardBottom: rect.bottom,
+        cardHeight: rect.height,
+      });
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    const timer = setTimeout(handleResize, 100);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const beams = [
+    {
+      path: `M 50,0 C 50,${dimensions.cardTop * 0.6} ${dimensions.cardLeft * 0.8},${dimensions.cardTop + 50} ${dimensions.cardLeft},${dimensions.cardTop + 50}`,
+      gradientConfig: {
+        initial: { x1: "-20%", x2: "-10%", y1: "0", y2: "0" },
+        animate: { x1: ["-20%", "120%"], x2: ["-10%", "130%"] },
+        transition: { duration: 4, repeat: Infinity, ease: "linear" }
+      },
+      connectionPoints: [{ cx: dimensions.cardLeft, cy: dimensions.cardTop + 50, r: 3.5 }]
+    },
+    {
+      path: `M 0,${dimensions.height * 0.45} C ${dimensions.cardLeft * 0.5},${dimensions.height * 0.55} ${dimensions.cardLeft * 0.5},${dimensions.cardTop + dimensions.cardHeight * 0.4} ${dimensions.cardLeft},${dimensions.cardTop + dimensions.cardHeight * 0.4}`,
+      gradientConfig: {
+        initial: { x1: "-20%", x2: "-10%", y1: "0", y2: "0" },
+        animate: { x1: ["-20%", "120%"], x2: ["-10%", "130%"] },
+        transition: { duration: 3.2, repeat: Infinity, ease: "linear", delay: 0.5 }
+      },
+      connectionPoints: [{ cx: dimensions.cardLeft, cy: dimensions.cardTop + dimensions.cardHeight * 0.4, r: 3.5 }]
+    },
+    {
+      path: `M 50,${dimensions.height} C 50,${dimensions.height - (dimensions.height - dimensions.cardBottom) * 0.6} ${dimensions.cardLeft * 0.8},${dimensions.cardBottom - 50} ${dimensions.cardLeft},${dimensions.cardBottom - 50}`,
+      gradientConfig: {
+        initial: { x1: "-20%", x2: "-10%", y1: "0", y2: "0" },
+        animate: { x1: ["-20%", "120%"], x2: ["-10%", "130%"] },
+        transition: { duration: 4.5, repeat: Infinity, ease: "linear", delay: 1.0 }
+      },
+      connectionPoints: [{ cx: dimensions.cardLeft, cy: dimensions.cardBottom - 50, r: 3.5 }]
+    },
+    {
+      path: `M ${dimensions.width - 50},0 C ${dimensions.width - 50},${dimensions.cardTop * 0.6} ${dimensions.width - (dimensions.width - dimensions.cardRight) * 0.8},${dimensions.cardTop + 50} ${dimensions.cardRight},${dimensions.cardTop + 50}`,
+      gradientConfig: {
+        initial: { x1: "120%", x2: "110%", y1: "0", y2: "0" },
+        animate: { x1: ["120%", "-20%"], x2: ["110%", "-30%"] },
+        transition: { duration: 3.8, repeat: Infinity, ease: "linear", delay: 0.2 }
+      },
+      connectionPoints: [{ cx: dimensions.cardRight, cy: dimensions.cardTop + 50, r: 3.5 }]
+    },
+    {
+      path: `M ${dimensions.width},${dimensions.height * 0.45} C ${dimensions.width - (dimensions.width - dimensions.cardRight) * 0.5},${dimensions.height * 0.55} ${dimensions.width - (dimensions.width - dimensions.cardRight) * 0.5},${dimensions.cardTop + dimensions.cardHeight * 0.4} ${dimensions.cardRight},${dimensions.cardTop + dimensions.cardHeight * 0.4}`,
+      gradientConfig: {
+        initial: { x1: "120%", x2: "110%", y1: "0", y2: "0" },
+        animate: { x1: ["120%", "-20%"], x2: ["110%", "-30%"] },
+        transition: { duration: 3.0, repeat: Infinity, ease: "linear", delay: 0.7 }
+      },
+      connectionPoints: [{ cx: dimensions.cardRight, cy: dimensions.cardTop + dimensions.cardHeight * 0.4, r: 3.5 }]
+    },
+    {
+      path: `M ${dimensions.width - 50},${dimensions.height} C ${dimensions.width - 50},${dimensions.height - (dimensions.height - dimensions.cardBottom) * 0.6} ${dimensions.width - (dimensions.width - dimensions.cardRight) * 0.8},${dimensions.cardBottom - 50} ${dimensions.cardRight},${dimensions.cardBottom - 50}`,
+      gradientConfig: {
+        initial: { x1: "120%", x2: "110%", y1: "0", y2: "0" },
+        animate: { x1: ["120%", "-20%"], x2: ["110%", "-30%"] },
+        transition: { duration: 4.2, repeat: Infinity, ease: "linear", delay: 1.2 }
+      },
+      connectionPoints: [{ cx: dimensions.cardRight, cy: dimensions.cardBottom - 50, r: 3.5 }]
+    }
+  ];
+
   return (
     <div className="relative flex min-h-svh w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-12 transition-colors duration-300 auth-page-container">
-      {/* Blurred Hero Background Image */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat filter blur-[12px] scale-[1.05] pointer-events-none opacity-90" 
-        style={{ backgroundImage: "url('/hero.png')" }} 
-      />
-      
       {/* Dynamic Theme color overlay */}
       <div className="absolute inset-0 z-0 bg-background/10 dark:bg-background/25 transition-colors duration-300 pointer-events-none" />
 
@@ -42,8 +133,22 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
         />
       </div>
 
-      {/* Falling Cherry Blossoms Background Animation */}
-      <CherryBlossom />
+      {/* Pulse Beams Background Animation */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <PulseBeams
+          beams={beams}
+          width={dimensions.width}
+          height={dimensions.height}
+          baseColor="rgba(196, 30, 58, 0.12)"
+          accentColor="rgba(196, 30, 58, 0.3)"
+          gradientColors={{
+            start: "#c41e3a",
+            middle: "#ff4d6d",
+            end: "#c41e3a",
+          }}
+          className="w-full h-full"
+        />
+      </div>
 
       {/* Embedded CSS Animations & Theme Variables */}
       <style jsx global>{`
@@ -121,7 +226,7 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
       </header>
 
       {/* Content Container */}
-      <main className="relative z-10 w-full max-w-md animate-fade-in duration-500">
+      <main ref={cardRef} className="relative z-10 w-full max-w-md animate-fade-in duration-500">
         {children}
       </main>
     </div>

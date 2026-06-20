@@ -6,6 +6,30 @@ import { syncGmailCache, syncCalendarCache } from "@/lib/sync";
 import { broadcast } from "@/lib/sse";
 import { prisma } from "@/lib/db";
 
+// ── Rate-limit cooldown guard ──────────────────────────────────────────
+// The corsair library logs 429 errors internally without throwing them,
+// which means every incoming Pub/Sub webhook still triggers a full
+// processWebhook → Gmail API call → 429 cycle.  To break this loop we
+// track the last time we saw a 429 for each tenant and silently skip
+// processing until the cooldown expires.
+const rateLimitCooldowns = new Map<string, number>(); // tenantId → cooldown-until epoch ms
+const COOLDOWN_MS = 60_000; // 60 seconds default cooldown
+
+// Intercept console.error to detect corsair's internal 429 logging
+const originalConsoleError = console.error;
+let lastDetected429Tenant: string | null = null;
+
+console.error = (...args: any[]) => {
+  const msg = args.map(String).join(" ");
+  if (msg.includes("Too Many Requests") || msg.includes("429")) {
+    // Mark that the most recent webhook processing hit a rate limit
+    if (lastDetected429Tenant) {
+      rateLimitCooldowns.set(lastDetected429Tenant, Date.now() + COOLDOWN_MS);
+    }
+  }
+  originalConsoleError.apply(console, args);
+};
+
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
 
@@ -71,12 +95,46 @@ export async function POST(request: NextRequest) {
 
   const tenantId = resolvedTenantId;
 
+  // ── Cooldown check: skip processing if we recently hit a rate limit ──
+  const cooldownUntil = rateLimitCooldowns.get(tenantId);
+  if (cooldownUntil && Date.now() < cooldownUntil) {
+    // Silently acknowledge the webhook without calling processWebhook
+    return NextResponse.json(
+      { success: true, skipped: true, reason: "Rate-limit cooldown active" },
+      { status: 200 }
+    );
+  }
+
   console.info(`Webhook received for tenant: "${tenantId}", processing...`);
 
+  // Set the tenant context so the console.error interceptor knows which tenant hit a 429
+  lastDetected429Tenant = tenantId;
 
-  const result = await processWebhook(corsair, headers, body, {
-    tenantId,
-  });
+  let result;
+  try {
+    result = await processWebhook(corsair, headers, body, {
+      tenantId,
+    });
+  } catch (err: any) {
+    // Check if it's a rate limit error (429)
+    const isRateLimit =
+      err.status === 429 ||
+      err.statusCode === 429 ||
+      String(err).includes("429") ||
+      String(err).includes("Too Many Requests");
+
+    if (isRateLimit) {
+      rateLimitCooldowns.set(tenantId, Date.now() + COOLDOWN_MS);
+    }
+
+    // Always return 200 to acknowledge the Pub/Sub message and prevent retries
+    return NextResponse.json(
+      { success: false, error: "Webhook processing failed, acknowledged" },
+      { status: 200 }
+    );
+  } finally {
+    lastDetected429Tenant = null;
+  }
 
   console.info(
     "Plugin Processed:",
