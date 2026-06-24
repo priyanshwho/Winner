@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       },
     });
 
-    let rawEvents = [];
+    let rawEvents: any[] = [];
     if (corsairAccount) {
       rawEvents = await prisma.corsairEntity.findMany({
         where: {

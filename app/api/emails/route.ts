@@ -91,7 +91,7 @@ export async function GET(req: Request) {
       },
     });
 
-    let messages = [];
+    let messages: any[] = [];
     if (corsairAccount) {
       messages = await prisma.corsairEntity.findMany({
         where: {
