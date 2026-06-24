@@ -126,7 +126,7 @@ export default function FAQs() {
                 >
                   {/* Inner Clipped Content Container */}
                   <div
-                    className="bg-black/90 dark:bg-black/95 backdrop-blur-md overflow-hidden relative w-full h-full"
+                    className="bg-card dark:bg-black/95 backdrop-blur-md overflow-hidden relative w-full h-full"
                   >
                     {/* Lines overlay background */}
                     <div 
@@ -142,10 +142,10 @@ export default function FAQs() {
                     <motion.button
                       onClick={() => toggleFAQ(index)}
                       className={`w-full flex items-center justify-between p-5 md:p-[1.1rem] text-left cursor-pointer transition-colors ${
-                        isOpen ? "border-b border-white/5 bg-white/5" : "border-b border-transparent bg-transparent"
+                        isOpen ? "border-b border-border/40 bg-muted/20" : "border-b border-transparent bg-transparent"
                       }`}
                       whileHover={{
-                        backgroundColor: "rgba(255, 255, 255, 0.025)",
+                        backgroundColor: "rgba(120, 120, 120, 0.05)",
                       }}
                     >
                       <span 
@@ -172,7 +172,7 @@ export default function FAQs() {
                     <AnimatePresence>
                       {isOpen && (
                         <motion.div
-                          className="bg-black/20 overflow-hidden"
+                          className="bg-muted/10 dark:bg-black/20 overflow-hidden"
                           initial={{ height: 0, opacity: 0 }}
                           animate={{
                             height: "auto",
