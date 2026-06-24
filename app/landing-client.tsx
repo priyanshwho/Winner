@@ -15,6 +15,7 @@ import CTA from "@/components/landing/cta";
 import Footer from "@/components/landing/footer";
 import { PulseBeams } from "@/components/ui/pulse-beams";
 import { WavePath } from "@/components/ui/wave-path";
+import { motion, AnimatePresence } from "framer-motion";
 
 const heroBeams = [
   {
@@ -56,6 +57,43 @@ export default function LandingClient() {
   const toggleTheme = useAnimatedThemeToggle();
   const [activeSection, setActiveSection] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+
+  useEffect(() => {
+    // Only show if the user hasn't scrolled past it in a previous session
+    const hasScrolled = localStorage.getItem("hasScrolledPastHero");
+    if (!hasScrolled && window.scrollY < 50) {
+      setShowScrollIndicator(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowScrollIndicator(false);
+        localStorage.setItem("hasScrolledPastHero", "true");
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleScrollClick = () => {
+    const element = document.getElementById("features");
+    if (element) {
+      const wrapper = element.closest(".section-stack-wrapper") || element;
+      const targetY = (wrapper as HTMLElement).offsetTop;
+      window.scrollTo({
+        top: targetY,
+        behavior: "smooth"
+      });
+    } else {
+      window.scrollTo({
+        top: window.innerHeight * 0.9,
+        behavior: "smooth",
+      });
+    }
+  };
   // Keep toggleTheme in a ref so it never causes the GSAP useEffect to re-run
   const toggleThemeRef = useRef(toggleTheme);
   useEffect(() => { toggleThemeRef.current = toggleTheme; }, [toggleTheme]);
@@ -520,6 +558,37 @@ export default function LandingClient() {
             </PulseBeams>
           </div>
         </div>
+
+        {/* Scroll Down Indicator */}
+        <AnimatePresence>
+          {showScrollIndicator && (
+            <motion.div
+              initial={{ opacity: 0, y: 15, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: 15, transition: { duration: 0.4 } }}
+              className="absolute bottom-8 left-1/2 flex flex-col items-center gap-2 cursor-pointer z-20"
+              onClick={handleScrollClick}
+            >
+              <span className="text-[10px] text-foreground/50 uppercase tracking-[0.2em] font-medium select-none font-mono">
+                Scroll to Explore
+              </span>
+              <div className="w-[22px] h-[36px] border-2 border-foreground/20 rounded-full flex justify-center p-1">
+                <motion.div
+                  className="w-1.5 h-2.5 bg-[#c41e3a] rounded-full"
+                  animate={{
+                    y: [0, 12, 0],
+                    opacity: [1, 0.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* Additional Page Sections — sticky stacking scroll */}
