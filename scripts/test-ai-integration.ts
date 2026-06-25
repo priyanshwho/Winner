@@ -20,7 +20,7 @@ async function runTestHarness() {
   console.log("✓ Gemini API key detected.");
 
   // 2. Configure Gemini Model
-  const model = google("gemini-3.1-flash-lite");
+  const model = google("gemini-3.5-flash");
 
   // 3. Retrieve Corsair Tools for the active user session ID
   const tenantId = "tyDoX48xYCjXOtPGBhZ76isww2RtdQEP";

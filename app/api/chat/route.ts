@@ -115,11 +115,18 @@ export async function POST(req: Request) {
 
       const lastMessage = messages[messages.length - 1];
       if (lastMessage && lastMessage.role === 'user') {
+        let contentToSave = getMessageText(lastMessage);
+        if (Array.isArray(lastMessage.parts) && lastMessage.parts.length > 0) {
+          contentToSave = JSON.stringify({
+            text: getMessageText(lastMessage),
+            parts: lastMessage.parts
+          });
+        }
         await prisma.message.create({
           data: {
             conversationId,
             role: 'user',
-            content: getMessageText(lastMessage),
+            content: contentToSave,
           },
         });
       }
@@ -279,18 +286,37 @@ Always write return statements inside your "run_script" code.`,
     messages: convertClientMessagesToModelMessages(messages),
     tools: aiTools,
     stopWhen: stepCountIs(10),
-    async onFinish({ text }) {
-      if (conversationId && text) {
-        try {
-          await prisma.message.create({
-            data: {
-              conversationId,
-              role: 'assistant',
-              content: text,
-            }
+    async onFinish({ text, toolCalls, toolResults }) {
+      if (conversationId) {
+        let contentToSave = text;
+        if (toolCalls && toolCalls.length > 0) {
+          const toolInvocations = toolCalls.map(call => {
+            const res = toolResults?.find(r => (r as any).toolCallId === (call as any).toolCallId);
+            return {
+              state: 'result',
+              toolCallId: (call as any).toolCallId,
+              toolName: (call as any).toolName,
+              args: (call as any).args,
+              result: res ? (res as any).result : undefined
+            };
           });
-        } catch (err) {
-          console.error('Failed to save assistant message to database:', err);
+          contentToSave = JSON.stringify({
+            text,
+            toolInvocations
+          });
+        }
+        if (contentToSave) {
+          try {
+            await prisma.message.create({
+              data: {
+                conversationId,
+                role: 'assistant',
+                content: contentToSave,
+              }
+            });
+          } catch (err) {
+            console.error('Failed to save assistant message to database:', err);
+          }
         }
       }
     }

@@ -10,7 +10,7 @@ export async function getGoogleModel() {
       throw new Error('GOOGLE_GENERATIVE_AI_API_KEY is not defined');
     }
     const { google } = await import('@ai-sdk/google');
-    _model = google('gemini-3.1-flash-lite');
+    _model = google('gemini-3.5-flash');
   }
   return _model;
 }

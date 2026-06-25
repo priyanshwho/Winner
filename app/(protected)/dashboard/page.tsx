@@ -38,11 +38,32 @@ export default async function DashboardPage() {
   const initialConversations = dbConversations.map((c) => ({
     id: c.id,
     title: c.title,
-    messages: c.messages.map((m) => ({
-      id: m.id,
-      role: m.role as "user" | "assistant" | "system",
-      content: m.content,
-    })),
+    messages: c.messages.map((m) => {
+      let content = m.content;
+      let toolInvocations: any[] = [];
+      let parts: any[] = [];
+      
+      if (m.content.startsWith('{') || m.content.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(m.content);
+          if (parsed && typeof parsed === 'object') {
+            content = parsed.text !== undefined ? parsed.text : (parsed.content || '');
+            toolInvocations = parsed.toolInvocations || [];
+            parts = parsed.parts || [];
+          }
+        } catch (e) {
+          // Fallback to raw string content
+        }
+      }
+      
+      return {
+        id: m.id,
+        role: m.role as "user" | "assistant" | "system",
+        content,
+        ...(toolInvocations.length > 0 ? { toolInvocations } : {}),
+        ...(parts.length > 0 ? { parts } : {}),
+      };
+    }),
   }));
 
   return (

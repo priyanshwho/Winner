@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Calendar, ShieldAlert, Sparkles, AlertTriangle, Check, RefreshCw, AlertCircle } from "lucide-react";
+import { Search, Calendar, ShieldAlert, Sparkles, AlertTriangle, Check, RefreshCw, AlertCircle, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function CalendarDraftCard({
@@ -26,6 +26,12 @@ export function CalendarDraftCard({
   const [currentStep, setCurrentStep] = useState(0); 
   const [conflicts, setConflicts] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const isReminder = !attendees || attendees.length === 0 || 
+    title.toLowerCase().includes("reminder") || 
+    title.toLowerCase().includes("workout") || 
+    title.toLowerCase().includes("task") || 
+    title.toLowerCase().includes("remind");
   const [refiningAlternative, setRefiningAlternative] = useState(false);
 
   const steps = [
@@ -123,12 +129,18 @@ export function CalendarDraftCard({
     <div className="p-5 rounded-2xl border border-border bg-card/60 backdrop-blur-md space-y-4 shadow-lg w-full max-w-xl animate-in fade-in zoom-in-95 duration-200 my-3 select-text">
       <div className="flex items-center justify-between pb-2 border-b border-border/50">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Draft Calendar Event (Google Calendar)</span>
+          {isReminder ? (
+            <Bell className="h-4 w-4 text-amber-500 animate-bounce" />
+          ) : (
+            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+          )}
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {isReminder ? "Personal Reminder Draft" : "Draft Calendar Event (Google Calendar)"}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          {status === 'created' && <span className="text-xs font-semibold text-emerald-500 flex items-center gap-1"><Check className="h-3.5 w-3.5" /> Scheduled</span>}
-          {status === 'creating' && <span className="text-xs text-muted-foreground flex items-center gap-1"><RefreshCw className="h-3 w-3 animate-spin" /> Scheduling...</span>}
+          {status === 'created' && <span className="text-xs font-semibold text-emerald-500 flex items-center gap-1"><Check className="h-3.5 w-3.5" /> {isReminder ? 'Reminder Set' : 'Scheduled'}</span>}
+          {status === 'creating' && <span className="text-xs text-muted-foreground flex items-center gap-1"><RefreshCw className="h-3 w-3 animate-spin" /> {isReminder ? 'Creating reminder...' : 'Scheduling...'}</span>}
         </div>
       </div>
 
@@ -292,7 +304,7 @@ export function CalendarDraftCard({
               onClick={handleCreate}
               className="text-xs py-1.5 h-8 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl cursor-pointer flex items-center gap-1 font-bold shadow-md"
             >
-              <span>Confirm & Schedule</span>
+              <span>{isReminder ? "Create Reminder" : "Confirm & Schedule"}</span>
             </Button>
           )}
         </div>

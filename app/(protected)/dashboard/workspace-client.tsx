@@ -218,31 +218,35 @@ export function WorkspaceClient({
   };
 
   // Vercel AI SDK chat hook using Gemini 3.1 Flash-Lite
-  const { messages, sendMessage, setMessages, status, addToolResult } = useChat({
-    onFinish: ({ message }) => {
-      setConversations((prev) => 
-        prev.map((c) => {
-          if (c.id === activeChatId) {
-            const allMessages = [...messages as any, { id: message.id, role: "assistant" as const, content: getMessageText(message) }];
-            // Update title on first assistant response
-            let title = c.title;
-            if (c.title.startsWith("New Conversation") || c.title.startsWith("Conversation ")) {
-              const firstUserMsg = allMessages.find(m => m.role === "user");
-              if (firstUserMsg) {
-                title = getMessageText(firstUserMsg).slice(0, 30) || c.title;
-              }
-            }
-            return {
-              ...c,
-              title,
-              messages: allMessages,
-            };
+  const { messages, sendMessage, setMessages, status, addToolResult } = useChat({});
+
+  // Sync useChat messages to the active conversation state
+  useEffect(() => {
+    setConversations((prev) =>
+      prev.map((c) => {
+        if (c.id === activeChatId) {
+          // Avoid no-op state updates
+          if (c.messages.length === messages.length && 
+              c.messages.every((m, idx) => m.id === (messages[idx] as any)?.id && m.content === (messages[idx] as any)?.content && (m as any).toolInvocations?.length === (messages[idx] as any).toolInvocations?.length)) {
+            return c;
           }
-          return c;
-        })
-      );
-    }
-  });
+          let title = c.title;
+          if (c.title.startsWith("New Conversation") || c.title.startsWith("Conversation ")) {
+            const firstUserMsg = messages.find(m => m.role === "user");
+            if (firstUserMsg) {
+              title = getMessageText(firstUserMsg).slice(0, 30) || c.title;
+            }
+          }
+          return {
+            ...c,
+            title,
+            messages: messages as any,
+          };
+        }
+        return c;
+      })
+    );
+  }, [messages, activeChatId]);
 
   // Auto scroll to bottom of chat
   useEffect(() => {
@@ -553,6 +557,83 @@ export function WorkspaceClient({
     router.push("/");
   };
 
+  const renderThinkingSteps = () => {
+    const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+    const userText = lastUserMessage ? getMessageText(lastUserMessage).toLowerCase() : '';
+    
+    // Find active assistant message
+    const lastMsg = messages[messages.length - 1];
+    const toolInvocations = lastMsg && lastMsg.role === 'assistant' ? (lastMsg as any).toolInvocations : [];
+
+    const isGmailRelevant = userText.includes("mail") || userText.includes("send") || userText.includes("inbox") || userText.includes("draft") || userText.includes("email") || userText.includes("reply");
+    const isCalendarRelevant = userText.includes("calendar") || userText.includes("event") || userText.includes("meet") || userText.includes("schedule") || userText.includes("remind") || userText.includes("reminder") || userText.includes("pm") || userText.includes("am") || userText.includes("tomorrow");
+    const isDraftRelevant = userText.includes("send") || userText.includes("draft") || userText.includes("schedule") || userText.includes("remind") || userText.includes("reminder") || userText.includes("meeting");
+
+    // Determine gmail status
+    const gmailCall = toolInvocations?.find((t: any) => t.toolName === 'run_script' && (t.args.code?.includes('gmail') || t.args.code?.includes('messages')));
+    const gmailStatus = !isGmailRelevant ? 'not-needed' : (gmailCall ? (gmailCall.state === 'result' ? 'completed' : 'active') : 'pending');
+
+    // Determine calendar status
+    const calCall = toolInvocations?.find((t: any) => t.toolName === 'run_script' && (t.args.code?.includes('googlecalendar') || t.args.code?.includes('events')));
+    const calStatus = !isCalendarRelevant ? 'not-needed' : (calCall ? (calCall.state === 'result' ? 'completed' : 'active') : (gmailStatus === 'completed' || gmailStatus === 'not-needed' ? 'active' : 'pending'));
+
+    // Determine draft status
+    const draftCall = toolInvocations?.find((t: any) => t.toolName === 'draft_email' || t.toolName === 'draft_calendar_event');
+    const draftStatus = !isDraftRelevant ? 'not-needed' : (draftCall ? (draftCall.state === 'result' ? 'completed' : 'active') : (calStatus === 'completed' || calStatus === 'not-needed' ? 'active' : 'pending'));
+
+    // Determine finalizing status
+    const finalizeStatus = (draftStatus === 'completed' || draftStatus === 'not-needed') && (calStatus === 'completed' || calStatus === 'not-needed') && (gmailStatus === 'completed' || gmailStatus === 'not-needed') ? 'active' : 'pending';
+
+    const steps = [
+      { id: 'analyze', label: 'Analyzing request parameters', status: 'completed' },
+      { id: 'gmail', label: 'Scanning Gmail workspace', status: gmailStatus },
+      { id: 'calendar', label: 'Searching Google Calendar board', status: calStatus },
+      { id: 'draft', label: 'Generating draft confirmation', status: draftStatus },
+      { id: 'finalize', label: 'Formulating final explanation', status: finalizeStatus }
+    ];
+
+    return (
+      <div className="flex gap-3.5 items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground/90">
+          <Bot className="h-3.5 w-3.5 text-muted-foreground/80 animate-pulse" />
+        </div>
+        <div className="p-4 rounded-2xl border border-border/50 bg-card/45 backdrop-blur-md space-y-3.5 shadow-lg w-full max-w-sm">
+          <div className="flex items-center justify-between pb-1.5 border-b border-border/40">
+            <div className="flex items-center gap-1.5">
+              <RefreshCw className="h-3 w-3 animate-spin text-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/90">Argon AI is working...</span>
+            </div>
+          </div>
+          <div className="space-y-2.5">
+            {steps.map((step) => {
+              if (step.status === 'not-needed') return null;
+              return (
+                <div key={step.id} className="flex items-center gap-2.5">
+                  <div className={`h-4 w-4 rounded-full flex items-center justify-center border text-[9px] font-bold transition-all ${
+                    step.status === 'completed' ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" :
+                    step.status === 'active' ? "bg-amber-500/10 border-amber-500/30 text-amber-500 animate-pulse" :
+                    "bg-muted/40 border-border/40 text-muted-foreground/50"
+                  }`}>
+                    {step.status === 'completed' ? <Check className="h-2.5 w-2.5" /> :
+                     step.status === 'active' ? <RefreshCw className="h-2 w-2 animate-spin" /> :
+                     null}
+                  </div>
+                  <span className={`text-[11px] ${
+                    step.status === 'completed' ? "text-muted-foreground line-through decoration-muted-foreground/30" :
+                    step.status === 'active' ? "text-foreground font-semibold" :
+                    "text-muted-foreground/50"
+                  }`}>
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderAssistantChat = (compact: boolean = false) => {
     return (
       <div className="h-full flex flex-col justify-between overflow-hidden bg-background">
@@ -752,23 +833,7 @@ export function WorkspaceClient({
                   </div>
                 </div>
               ))}
-              {isLoading && (
-                (() => {
-                  const visibleMessages = messages.filter(m => getMessageText(m).trim() !== "" || m.role === "user" || (m as any).toolInvocations?.length > 0);
-                  const lastVisible = visibleMessages[visibleMessages.length - 1];
-                  return !lastVisible || lastVisible.role !== "assistant";
-                })()
-              ) && (
-                <div className="flex gap-3.5 items-start">
-                  <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground/90">
-                    <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />
-                  </div>
-                  <div className="rounded-2xl px-3 py-1.5 bg-card border border-border/50 text-muted-foreground text-[10px] flex items-center gap-1.5">
-                    <RefreshCw className="h-2.5 w-2.5 animate-spin text-muted-foreground/60" />
-                    <span>Argon is On it...</span>
-                  </div>
-                </div>
-              )}
+              {isLoading && renderThinkingSteps()}
               <div ref={messagesEndRef} />
             </div>
           )}
