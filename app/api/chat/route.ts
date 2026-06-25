@@ -432,4 +432,50 @@ Always write return statements inside your "run_script" code.`,
   return result.toUIMessageStreamResponse();
 }
 
+export async function DELETE(req: Request) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const conversationId = searchParams.get('id');
+
+  if (!conversationId) {
+    return new Response('Missing conversation ID', { status: 400 });
+  }
+
+  try {
+    const conversation = await prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!conversation) {
+      return new Response('Conversation not found', { status: 404 });
+    }
+
+    await prisma.conversation.delete({
+      where: { id: conversationId },
+    });
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err: any) {
+    console.error('Failed to delete conversation:', err);
+    return new Response(JSON.stringify({ error: err.message || 'Failed to delete conversation' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
+
 

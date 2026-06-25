@@ -48,9 +48,15 @@ export function WorkspaceClient({
   // ── URL query param handling ─────────────────────────────────────────────
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab === "configuration") router.push("/settings");
-    else if (tab === "inbox") setActiveTab("inbox");
-    else if (tab === "calendar") setActiveTab("calendar");
+    if (tab === "configuration") {
+      router.push("/settings");
+    } else if (tab === "inbox") {
+      setActiveTab("inbox");
+    } else if (tab === "calendar") {
+      setActiveTab("calendar");
+    } else {
+      setActiveTab("chat");
+    }
   }, [searchParams, router]);
 
   // Keyboard ⌘K shortcut
@@ -94,15 +100,17 @@ export function WorkspaceClient({
   const [events, setEvents] = useState<CalendarItem[]>([]);
   const [emailsLoading, setEmailsLoading] = useState(false);
   const [eventsLoading, setEventsLoading] = useState(false);
+  const [activeLabel, setActiveLabel] = useState<string>("INBOX");
 
-  const fetchEmails = async () => {
+  const fetchEmails = async (label = "INBOX") => {
     setEmailsLoading(true);
     try {
-      const res = await fetch("/api/emails");
+      const res = await fetch(`/api/emails?label=${label}`);
       if (res.ok) {
         const data = await res.json();
         setEmails(data.emails || []);
       }
+      setActiveLabel(label);
     } catch (err) {
       console.error("Failed to load emails:", err);
     } finally {
@@ -126,9 +134,16 @@ export function WorkspaceClient({
   };
 
   useEffect(() => {
-    if (activeTab === "inbox") fetchEmails();
+    if (activeTab === "inbox") fetchEmails(activeLabel);
     else if (activeTab === "calendar") fetchEvents();
   }, [activeTab]);
+
+
+  // Clear search query and results when tab or conversation changes
+  useEffect(() => {
+    setSearchQuery("");
+    setShowSearchResults(false);
+  }, [activeTab, activeChatId]);
 
   // ── Search state ─────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("");
@@ -290,9 +305,9 @@ export function WorkspaceClient({
   const [conversations, setConversations] = useState<ChatConversation[]>(
     initialConversations.length > 0
       ? initialConversations
-      : [{ id: "default-chat", title: "New Conversation", messages: [] }]
+      : [{ id: activeChatIdParam || `chat-${Date.now()}`, title: "New Conversation", messages: [] }]
   );
-  const activeChatId = activeChatIdParam || (initialConversations.length > 0 ? initialConversations[0].id : "default-chat");
+  const activeChatId = activeChatIdParam || (initialConversations.length > 0 ? initialConversations[0].id : conversations[0]?.id || "default-chat");
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -331,6 +346,8 @@ export function WorkspaceClient({
   // Sync URL active chat ID with conversations state and restore messages
   // This ONLY depends on activeChatId to prevent rendering loops when conversations list updates
   useEffect(() => {
+    setInput("");
+    setSelectedFiles([]);
     setConversations((prev) => {
       const hasChat = prev.some((c) => c.id === activeChatId);
       if (activeChatId && !hasChat) {
@@ -363,6 +380,41 @@ export function WorkspaceClient({
     const newId = `chat-${Date.now()}`;
     router.push(`/dashboard/${newId}`);
   };
+
+  const deleteConversation = async (chatId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm("Are you sure you want to delete this conversation?")) return;
+
+    try {
+      const res = await fetch(`/api/chat?id=${chatId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setConversations((prev) => {
+          const next = prev.filter((c) => c.id !== chatId);
+          if (chatId === activeChatId) {
+            setTimeout(() => {
+              if (next.length > 0) {
+                router.push(`/dashboard/${next[0].id}`);
+              } else {
+                createNewChat();
+              }
+            }, 0);
+          }
+          return next;
+        });
+      } else {
+        alert("Failed to delete conversation from database.");
+      }
+    } catch (err) {
+      console.error("Failed to delete conversation:", err);
+      alert("Error deleting conversation.");
+    }
+  };
+
 
   const getFilesWithDataUrls = async (files: File[]) =>
     Promise.all(
@@ -415,8 +467,8 @@ export function WorkspaceClient({
 
   const submitMessageDirectly = (promptText: string) => {
     if (isLoading) return;
-    setActiveTab("chat");
     setShowSearchResults(false);
+    router.push(`/dashboard/${activeChatId}`);
     const userMsg = {
       id: `user-${Date.now()}`,
       role: "user" as const,
@@ -494,18 +546,18 @@ export function WorkspaceClient({
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
         activeTab={activeTab}
-        setActiveTab={(t) => setActiveTab(t)}
         showSearchResults={showSearchResults}
-        setShowSearchResults={setShowSearchResults}
         activeChatId={activeChatId}
         conversations={conversations}
         createNewChat={createNewChat}
-        selectConversation={selectConversation}
         userName={userName}
         userEmail={userEmail}
         userImage={userImage}
         onSettings={() => router.push("/settings")}
         onSignOut={handleSignOut}
+        deleteConversation={deleteConversation}
+        hasGmail={initialHasGmail}
+        hasCalendar={initialHasCalendar}
       />
 
       {/* MIDDLE: Main content */}
@@ -526,12 +578,12 @@ export function WorkspaceClient({
               searchResults={searchResults}
               onSelectEmail={(email) => {
                 setSelectedEmail(email);
-                setActiveTab("inbox");
+                router.push(`/dashboard/${activeChatId}?tab=inbox`);
                 setShowSearchResults(false);
                 setSearchQuery("");
               }}
               onSelectEvent={() => {
-                setActiveTab("calendar");
+                router.push(`/dashboard/${activeChatId}?tab=calendar`);
                 setShowSearchResults(false);
                 setSearchQuery("");
               }}
@@ -566,7 +618,7 @@ export function WorkspaceClient({
               onSendReply={handleSendInboxReply}
               onAskAI={(subject, sender, threadId) => {
                 setInput(`Reply to email: "${subject}" from "${sender}" (threadId: ${threadId})`);
-                setActiveTab("chat");
+                router.push(`/dashboard/${activeChatId}`);
               }}
               copyToClipboard={(text) => navigator.clipboard.writeText(text)}
             />
@@ -628,8 +680,12 @@ export function WorkspaceClient({
         open={openCommandPalette}
         onOpenChange={setOpenCommandPalette}
         onNavigate={(tab) => {
-          setActiveTab(tab);
           setShowSearchResults(false);
+          if (tab === "chat") {
+            router.push(`/dashboard/${activeChatId}`);
+          } else {
+            router.push(`/dashboard/${activeChatId}?tab=${tab}`);
+          }
         }}
         onSettings={() => router.push("/settings")}
         onAskAI={submitMessageDirectly}
@@ -638,7 +694,7 @@ export function WorkspaceClient({
           setEventStart(formatDateTimeLocal(start));
           setEventEnd(formatDateTimeLocal(end));
           setEventGuests("");
-          setActiveTab("calendar");
+          router.push(`/dashboard/${activeChatId}?tab=calendar`);
           setCalendarRightPanelMode("manual");
         }}
       />

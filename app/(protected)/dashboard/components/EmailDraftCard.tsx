@@ -3,6 +3,7 @@ import { Check, RefreshCw, Paperclip, Trash2, AlertCircle, Send } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { EmailAttachment } from "./types";
 import { EmailThreadAccordion } from "./EmailThreadAccordion";
+import { cleanErrorMessage } from "./utils";
 
 export function EmailDraftCard({
   to: initialTo,
@@ -57,7 +58,7 @@ export function EmailDraftCard({
         throw new Error(data.error || 'Failed to refine email');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to refine email');
+      setErrorMessage(cleanErrorMessage(err.message || 'Failed to refine email'));
       setStatus('error');
     }
   };
@@ -101,7 +102,7 @@ export function EmailDraftCard({
         throw new Error(data.error || 'Failed to send email');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to send email');
+      setErrorMessage(cleanErrorMessage(err.message || 'Failed to send email'));
       setStatus('error');
     }
   };

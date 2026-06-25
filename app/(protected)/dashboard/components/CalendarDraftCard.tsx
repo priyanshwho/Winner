@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, Calendar, ShieldAlert, Sparkles, AlertTriangle, Check, RefreshCw, AlertCircle, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cleanErrorMessage } from "./utils";
 
 export function CalendarDraftCard({
   title: initialTitle,
@@ -78,7 +79,7 @@ export function CalendarDraftCard({
         setStatus('ready');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Conflict check failed');
+      setErrorMessage(cleanErrorMessage(err.message || 'Conflict check failed'));
       setStatus('error');
     }
   };
@@ -107,7 +108,7 @@ export function CalendarDraftCard({
         throw new Error(data.error || 'No alternative slots found');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to find alternative slot');
+      setErrorMessage(cleanErrorMessage(err.message || 'Failed to find alternative slot'));
       setStatus('error');
       setRefiningAlternative(false);
     }
@@ -133,7 +134,7 @@ export function CalendarDraftCard({
         throw new Error(data.error || 'Failed to schedule event');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to schedule event');
+      setErrorMessage(cleanErrorMessage(err.message || 'Failed to schedule event'));
       setStatus('error');
     }
   };

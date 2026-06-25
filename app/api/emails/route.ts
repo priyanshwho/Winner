@@ -100,6 +100,7 @@ function mapMessageToEmail(msg: any) {
     body: decodeHtmlEntities(getEmailBody(data)),
     htmlBody: getEmailHtmlBody(data),
     receivedAt,
+    labelIds: data.labelIds || [],
   };
 }
 
@@ -111,6 +112,9 @@ export async function GET(req: Request) {
   if (!session?.user) {
     return new Response('Unauthorized', { status: 401 });
   }
+
+  const { searchParams } = new URL(req.url);
+  const label = searchParams.get('label') || 'INBOX';
 
   try {
     const tenantClient = corsair.withTenant(session.user.id);
@@ -142,14 +146,25 @@ export async function GET(req: Request) {
       .map(mapMessageToEmail)
       .filter(Boolean) as any[];
 
+    // Filter by label in JS memory
+    if (label.toUpperCase() !== 'ALL') {
+      formattedEmails = formattedEmails.filter(email =>
+        Array.isArray(email.labelIds) &&
+        email.labelIds.map((l: string) => l.toUpperCase()).includes(label.toUpperCase())
+      );
+    }
+
     // Step 3: If DB is empty or all entries were stubs, fall back to live API
     if (formattedEmails.length === 0) {
-      console.info('Gmail DB cache empty or all stubs — falling back to live API');
-      const apiResponse = await tenantClient.gmail.api.messages.list({
+      console.info(`Gmail DB cache empty or all stubs — falling back to live API for label: ${label}`);
+      const listParams: any = {
         userId: 'me',
-        maxResults: 10, // Fetch fewer if we have to do N+1 API calls
-        labelIds: ['INBOX'],
-      });
+        maxResults: 10,
+      };
+      if (label.toUpperCase() !== 'ALL') {
+        listParams.labelIds = [label.toUpperCase()];
+      }
+      const apiResponse = await tenantClient.gmail.api.messages.list(listParams);
 
       const rawMessages = apiResponse.messages || [];
       
@@ -228,3 +243,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ emails: [] }, { status: 500 });
   }
 }
+
