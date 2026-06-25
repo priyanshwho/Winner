@@ -387,33 +387,42 @@ export function WorkspaceClient({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!confirm("Are you sure you want to delete this conversation?")) return;
-
-    try {
-      const res = await fetch(`/api/chat?id=${chatId}`, {
-        method: "DELETE",
+    const removeChatFromState = (id: string) => {
+      setConversations((prev) => {
+        const next = prev.filter((c) => c.id !== id);
+        if (id === activeChatId) {
+          setTimeout(() => {
+            if (next.length > 0) {
+              router.push(`/dashboard/${next[0].id}`);
+            } else {
+              createNewChat();
+            }
+          }, 0);
+        }
+        return next;
       });
+    };
 
-      if (res.ok) {
-        setConversations((prev) => {
-          const next = prev.filter((c) => c.id !== chatId);
-          if (chatId === activeChatId) {
-            setTimeout(() => {
-              if (next.length > 0) {
-                router.push(`/dashboard/${next[0].id}`);
-              } else {
-                createNewChat();
-              }
-            }, 0);
-          }
-          return next;
+    const target = conversations.find((c) => c.id === chatId);
+    const hasMessages = target && target.messages && target.messages.length > 0;
+
+    if (hasMessages) {
+      try {
+        const res = await fetch(`/api/chat?id=${chatId}`, {
+          method: "DELETE",
         });
-      } else {
-        alert("Failed to delete conversation from database.");
+
+        if (res.ok || res.status === 404) {
+          removeChatFromState(chatId);
+        } else {
+          alert("Failed to delete conversation from database.");
+        }
+      } catch (err) {
+        console.error("Failed to delete conversation:", err);
+        alert("Error deleting conversation.");
       }
-    } catch (err) {
-      console.error("Failed to delete conversation:", err);
-      alert("Error deleting conversation.");
+    } else {
+      removeChatFromState(chatId);
     }
   };
 
