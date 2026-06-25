@@ -24,9 +24,9 @@ function convertClientMessagesToModelMessages(messages: any[]): any[] {
 
   for (const m of messages || []) {
     if (m.role === 'user') {
-      modelMessages.push({ role: 'user', content: m.content });
+      modelMessages.push({ role: 'user', content: getMessageText(m) });
     } else if (m.role === 'system') {
-      modelMessages.push({ role: 'system', content: m.content });
+      modelMessages.push({ role: 'system', content: getMessageText(m) });
     } else if (m.role === 'assistant') {
       const toolInvocations = m.toolInvocations || [];
       const resolvedCalls = toolInvocations.filter(
@@ -34,11 +34,12 @@ function convertClientMessagesToModelMessages(messages: any[]): any[] {
       );
 
       if (resolvedCalls.length === 0) {
-        modelMessages.push({ role: 'assistant', content: m.content || '' });
+        modelMessages.push({ role: 'assistant', content: getMessageText(m) });
       } else {
         const assistantContent: any[] = [];
-        if (m.content) {
-          assistantContent.push({ type: 'text', text: m.content });
+        const contentText = getMessageText(m);
+        if (contentText) {
+          assistantContent.push({ type: 'text', text: contentText });
         }
         
         for (const call of resolvedCalls) {
