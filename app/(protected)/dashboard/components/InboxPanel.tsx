@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailItem } from "./types";
+import { MarkdownMessage } from "./MarkdownMessage";
 
 interface InboxPanelProps {
   emailsLoading: boolean;
@@ -185,10 +186,22 @@ export function InboxPanel({
               </div>
               <div className="pt-4 border-t border-border/60">
                 <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-2">
-                  {selectedEmail.body ? "Message Content" : "Snippet"}
+                  {selectedEmail.htmlBody || selectedEmail.body ? "Message Content" : "Snippet"}
                 </span>
-                <div className="text-sm text-foreground/90 leading-relaxed break-words whitespace-pre-wrap select-text max-h-[300px] overflow-y-auto pr-1">
-                  {selectedEmail.body || selectedEmail.snippet}
+                <div className="border border-border/80 rounded-xl overflow-hidden bg-white shadow-inner">
+                  {selectedEmail.htmlBody ? (
+                    <iframe
+                      srcDoc={selectedEmail.htmlBody}
+                      sandbox="allow-popups allow-popups-to-escape-sandbox"
+                      className="w-full border-0 h-[400px] bg-white"
+                      title="Email Content"
+                      style={{ colorScheme: "light" }}
+                    />
+                  ) : (
+                    <div className="text-sm text-foreground/90 p-4 leading-relaxed break-words whitespace-pre-wrap select-text max-h-[300px] overflow-y-auto pr-1 bg-card/10">
+                      {selectedEmail.body || selectedEmail.snippet}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -242,7 +255,7 @@ export function InboxPanel({
                     <strong className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block pb-2">
                       AI Summary
                     </strong>
-                    {aiSummary}
+                    <MarkdownMessage content={aiSummary} />
                   </div>
                 )}
               </div>

@@ -47,6 +47,37 @@ function getEmailBody(messageData: any): string {
   return body || snippet;
 }
 
+function getEmailHtmlBody(messageData: any): string {
+  if (!messageData) return '';
+  
+  let body = '';
+  const payload = messageData.payload;
+  if (payload) {
+    if (payload.body && payload.body.mimeType === 'text/html' && payload.body.data) {
+      try {
+        body = Buffer.from(payload.body.data, 'base64').toString('utf-8');
+      } catch {}
+    } else if (payload.parts) {
+      const findHtmlPart = (parts: any[]): string => {
+        for (const part of parts) {
+          if (part.mimeType === 'text/html' && part.body && part.body.data) {
+            try {
+              return Buffer.from(part.body.data, 'base64').toString('utf-8');
+            } catch {}
+          }
+          if (part.parts) {
+            const bodyStr = findHtmlPart(part.parts);
+            if (bodyStr) return bodyStr;
+          }
+        }
+        return '';
+      };
+      body = findHtmlPart(payload.parts);
+    }
+  }
+  return body;
+}
+
 function mapMessageToEmail(msg: any) {
   const data = msg.data || {};
   const headersList = data.payload?.headers || [];
@@ -67,6 +98,7 @@ function mapMessageToEmail(msg: any) {
     sender: sender || 'Unknown Sender',
     snippet: decodeHtmlEntities(data.snippet || ''),
     body: decodeHtmlEntities(getEmailBody(data)),
+    htmlBody: getEmailHtmlBody(data),
     receivedAt,
   };
 }

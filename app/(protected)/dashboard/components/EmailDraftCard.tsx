@@ -47,7 +47,7 @@ export function EmailDraftCard({
       const res = await fetch('/api/emails/refine', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body, tone })
+        body: JSON.stringify({ body, tone, to })
       });
       const data = await res.json();
       if (data.refinedBody) {

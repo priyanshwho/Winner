@@ -5,6 +5,24 @@ import { prisma } from '@/lib/db';
 import { generateText } from 'ai';
 import { getGoogleModel } from '@/lib/ai';
 
+function parseNameFromSender(sender: string): string {
+  if (!sender) return '';
+  // Match "Name <email>"
+  const match = sender.match(/^([^<]+)/);
+  if (match) {
+    const name = match[1].replace(/['"]/g, '').trim();
+    if (name && !name.includes('@')) {
+      return name;
+    }
+  }
+  // If only email, return username part
+  const emailMatch = sender.match(/([^@\s<>]+)@/);
+  if (emailMatch) {
+    return emailMatch[1];
+  }
+  return sender;
+}
+
 function getEmailBody(messageData: any): string {
   if (!messageData) return '';
   const snippet = messageData.snippet || '';
@@ -77,13 +95,20 @@ export async function POST(req: Request) {
 
     const model = await getGoogleModel();
 
+    const senderName = session.user.name || 'User';
+    const recipientName = parseNameFromSender(sender);
+
     const result = await generateText({
       model,
-      system: 'You are an email drafting assistant. Draft a professional, contextual reply to the provided email. Adhere to any special instructions provided. Write only the email reply text body, without template fields or subject lines.',
+      system: `You are an email drafting assistant. Draft a professional, contextual reply to the provided email. Adhere to any special instructions.
+- Output ONLY the single email reply text body. Do not write subject, options, markdown format, code fences, headers, annotations, or tips.
+- Use plain text formatting only. Do not use bold tags like **, markdown headers, or other markdown punctuation.
+- Automatically use "${senderName}" as the sender's name at the end of the email (do not use placeholders like [Your Name] or [User Name]).
+- Automatically address the recipient as "${recipientName}". If no name can be parsed or deduced, use a pleasant greeting like "Hi," or "Hello," without brackets or placeholders. Never leave placeholders like [Recipient's Name] or [Recipient Name].`,
       prompt: `Email received:\n${emailContext}\n\nDrafting instructions: ${instructions || 'Write a polite, professional reply.'}`,
     });
 
-    return NextResponse.json({ draft: result.text });
+    return NextResponse.json({ draft: result.text.trim() });
   } catch (err) {
     console.error('Failed to generate draft:', err);
     return NextResponse.json({ error: 'Failed to generate draft' }, { status: 500 });

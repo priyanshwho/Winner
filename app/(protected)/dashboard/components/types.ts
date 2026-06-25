@@ -16,6 +16,7 @@ export interface EmailItem {
   sender: string;
   snippet: string;
   body?: string;
+  htmlBody?: string;
   receivedAt: string;
 }
 
