@@ -6,6 +6,7 @@ export interface WorkspaceClientProps {
   initialHasGmail: boolean;
   initialHasCalendar: boolean;
   initialConversations?: ChatConversation[];
+  activeChatIdParam?: string;
 }
 
 export interface EmailItem {

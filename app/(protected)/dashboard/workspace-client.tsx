@@ -34,6 +34,7 @@ export function WorkspaceClient({
   initialHasGmail,
   initialHasCalendar,
   initialConversations = [],
+  activeChatIdParam,
 }: WorkspaceClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -291,9 +292,7 @@ export function WorkspaceClient({
       ? initialConversations
       : [{ id: "default-chat", title: "New Conversation", messages: [] }]
   );
-  const [activeChatId, setActiveChatId] = useState<string>(
-    initialConversations.length > 0 ? initialConversations[0].id : "default-chat"
-  );
+  const activeChatId = activeChatIdParam || (initialConversations.length > 0 ? initialConversations[0].id : "default-chat");
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -326,32 +325,47 @@ export function WorkspaceClient({
     );
   }, [messages, activeChatId]);
 
-  // Restore messages when switching conversations
+  // Sync URL active chat ID with conversations state and restore messages
   useEffect(() => {
-    const active = conversations.find((c) => c.id === activeChatId);
-    if (active && active.messages.length > 0) setMessages(active.messages as any);
-  }, []);
+    const hasChat = conversations.some((c) => c.id === activeChatId);
+    if (activeChatId && !hasChat) {
+      setConversations((prev) => {
+        if (prev.some((c) => c.id === activeChatId)) return prev;
+        return [
+          { id: activeChatId, title: "New Conversation", messages: [] },
+          ...prev,
+        ];
+      });
+      setMessages([]);
+    } else {
+      const active = conversations.find((c) => c.id === activeChatId);
+      if (active) {
+        setMessages((prev) => {
+          if (
+            prev.length === active.messages.length &&
+            prev.every((m, idx) => m.id === active.messages[idx].id)
+          ) {
+            return prev;
+          }
+          return active.messages as any;
+        });
+      } else {
+        setMessages([]);
+      }
+    }
+  }, [activeChatId, conversations]);
 
   const isLoading = status === "submitted" || status === "streaming";
 
   const selectConversation = (chatId: string) => {
     setActiveTab("chat");
     setShowSearchResults(false);
-    setActiveChatId(chatId);
-    const selected = conversations.find((c) => c.id === chatId);
-    if (selected) setMessages(selected.messages as any);
+    router.push(`/dashboard/${chatId}`);
   };
 
   const createNewChat = () => {
     const newId = `chat-${Date.now()}`;
-    setConversations((prev) => [
-      { id: newId, title: `Conversation ${prev.length + 1}`, messages: [] },
-      ...prev,
-    ]);
-    setActiveChatId(newId);
-    setActiveTab("chat");
-    setShowSearchResults(false);
-    setMessages([]);
+    router.push(`/dashboard/${newId}`);
   };
 
   const getFilesWithDataUrls = async (files: File[]) =>

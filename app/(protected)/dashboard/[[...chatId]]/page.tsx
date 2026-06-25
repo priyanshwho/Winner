@@ -2,11 +2,20 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { WorkspaceClient } from "./workspace-client";
+import { WorkspaceClient } from "../workspace-client";
 import { SIGN_IN_PATH } from "@/features/auth/utils";
 import { Suspense } from "react";
 
-export default async function DashboardPage() {
+interface PageProps {
+  params: Promise<{
+    chatId?: string[];
+  }>;
+}
+
+export default async function DashboardPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const chatIdParam = resolvedParams.chatId?.[0];
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -66,6 +75,17 @@ export default async function DashboardPage() {
     }),
   }));
 
+  // Handle route param redirects to keep the URL matching the active chat
+  if (!chatIdParam) {
+    if (initialConversations.length > 0) {
+      redirect(`/dashboard/${initialConversations[0].id}`);
+    } else {
+      redirect(`/dashboard/chat-${Date.now()}`);
+    }
+  } else if (chatIdParam === "new") {
+    redirect(`/dashboard/chat-${Date.now()}`);
+  }
+
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-foreground font-sans">
@@ -83,8 +103,8 @@ export default async function DashboardPage() {
         initialHasGmail={hasGmail}
         initialHasCalendar={hasCalendar}
         initialConversations={initialConversations}
+        activeChatIdParam={chatIdParam}
       />
     </Suspense>
   );
 }
-

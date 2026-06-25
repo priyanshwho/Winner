@@ -187,6 +187,12 @@ export async function POST(req: Request) {
             content: contentToSave,
           },
         });
+
+        // Touch the conversation's updatedAt timestamp
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { updatedAt: new Date() }
+        });
       }
     } catch (err) {
       console.error('Failed to sync conversation/message to database:', err);
@@ -387,6 +393,33 @@ Always write return statements inside your "run_script" code.`,
                 role: 'assistant',
                 content: contentToSave,
               }
+            });
+
+            // Touch the conversation's updatedAt timestamp and update title if it's default
+            const conv = await prisma.conversation.findUnique({
+              where: { id: conversationId }
+            });
+            const updateData: any = { updatedAt: new Date() };
+            if (conv && (conv.title === 'New Conversation' || conv.title.startsWith('Conversation '))) {
+              // Find first user message for title
+              const firstMsg = await prisma.message.findFirst({
+                where: { conversationId, role: 'user' },
+                orderBy: { timestamp: 'asc' }
+              });
+              if (firstMsg) {
+                let parsedText = firstMsg.content;
+                if (firstMsg.content.startsWith('{') || firstMsg.content.startsWith('[')) {
+                  try {
+                    const parsed = JSON.parse(firstMsg.content);
+                    parsedText = parsed.text || parsed.content || firstMsg.content;
+                  } catch {}
+                }
+                updateData.title = parsedText.slice(0, 30) || 'New Conversation';
+              }
+            }
+            await prisma.conversation.update({
+              where: { id: conversationId },
+              data: updateData
             });
           } catch (err) {
             console.error('Failed to save assistant message to database:', err);
