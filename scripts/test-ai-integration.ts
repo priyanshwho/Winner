@@ -12,15 +12,23 @@ async function runTestHarness() {
   console.log("      ARGONAI AI INTEGRATION TEST HARNESS        ");
   console.log("=================================================");
 
-  // 1. Verify GOOGLE_GENERATIVE_AI_API_KEY
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    console.error("❌ ERROR: GOOGLE_GENERATIVE_AI_API_KEY is not defined in environment.");
+  // 1. Verify API Keys
+  if (!process.env.GROQ_API_KEY && !process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    console.error("❌ ERROR: Neither GROQ_API_KEY nor GOOGLE_GENERATIVE_AI_API_KEY is defined in environment.");
     process.exit(1);
   }
-  console.log("✓ Gemini API key detected.");
 
-  // 2. Configure Gemini Model
-  const model = google("gemini-3.5-flash");
+  // 2. Configure Model
+  let model;
+  if (process.env.GROQ_API_KEY) {
+    const { createGroq } = await import("@ai-sdk/groq");
+    const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
+    model = groq("llama-3.3-70b-versatile");
+    console.log("✓ Using Groq API provider (llama-3.3-70b-versatile).");
+  } else {
+    model = google("gemini-3.5-flash");
+    console.log("✓ Using Gemini API provider (gemini-3.5-flash).");
+  }
 
   // 3. Retrieve Corsair Tools for the active user session ID
   const tenantId = "tyDoX48xYCjXOtPGBhZ76isww2RtdQEP";
