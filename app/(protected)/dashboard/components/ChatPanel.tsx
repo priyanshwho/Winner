@@ -411,16 +411,16 @@ export function ChatPanel({
                                     return (
                                       <div key={idx} className="p-3 rounded-xl border border-border/85 bg-card/45 hover:bg-card/90 transition flex flex-col gap-2 shadow-sm select-text">
                                         <div>
-                                          <span className="text-sm font-bold text-muted-foreground/60 uppercase block">Sender</span>
+                                          <span className="text-xs font-bold text-muted-foreground/60 uppercase block">Sender</span>
                                           <span className="text-sm font-bold text-foreground">{sender}</span>
                                         </div>
                                         <div>
-                                          <span className="text-sm font-bold text-muted-foreground/60 uppercase block">Subject</span>
+                                          <span className="text-xs font-bold text-muted-foreground/60 uppercase block">Subject</span>
                                           <span className="text-sm font-extrabold text-foreground">{subject}</span>
                                         </div>
                                         {snippet && (
                                           <div>
-                                            <span className="text-sm font-bold text-muted-foreground/60 uppercase block">Snippet</span>
+                                            <span className="text-xs font-bold text-muted-foreground/60 uppercase block">Snippet</span>
                                             <span className="text-sm text-muted-foreground leading-relaxed">{snippet}</span>
                                           </div>
                                         )}
@@ -428,7 +428,7 @@ export function ChatPanel({
                                           <Button
                                             size="sm"
                                             onClick={() => setInput(`Reply to email: "${subject}" from "${sender}" (threadId: ${threadId})`)}
-                                            className="text-[9px] h-6 px-2 bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-lg flex items-center gap-1 cursor-pointer"
+                                            className="text-xs h-6 px-2 bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-lg flex items-center gap-1 cursor-pointer"
                                           >
                                             <span>Reply via AI</span>
                                           </Button>
