@@ -806,6 +806,7 @@ export function WorkspaceClient({
   const [eventGuests, setEventGuests] = useState("");
   const [eventCreating, setEventCreating] = useState(false);
   const [eventStatus, setEventStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [calendarRightPanelMode, setCalendarRightPanelMode] = useState<"assistant" | "manual">("assistant");
 
   // Search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -891,6 +892,11 @@ export function WorkspaceClient({
       );
     }
   });
+
+  // Auto scroll to bottom of chat
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Sync initial conversation messages into useChat hook on mount
   useEffect(() => {
@@ -1171,6 +1177,237 @@ export function WorkspaceClient({
     router.push("/");
   };
 
+  const renderAssistantChat = (compact: boolean = false) => {
+    return (
+      <div className="h-full flex flex-col justify-between overflow-hidden bg-background">
+        {/* Header */}
+        {compact && (
+          <div className="px-4 py-3 border-b border-border/60 bg-background/60 backdrop-blur-sm shrink-0 flex items-center justify-between z-10">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-foreground tracking-wider uppercase">Argon Assistant</span>
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
+            {/* If we are in calendar tab, allow toggling back to manual scheduling form */}
+            {activeTab === "calendar" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCalendarRightPanelMode("manual")}
+                className="text-[10px] h-7 px-2 hover:bg-muted text-muted-foreground cursor-pointer"
+              >
+                Manual Form
+              </Button>
+            )}
+          </div>
+        )}
+
+        <div className={`flex-1 overflow-y-auto ${compact ? "px-4 py-4 space-y-4" : "px-6 py-6 space-y-6"}`}>
+          {messages.length === 0 ? (
+            <div className={`h-full flex flex-col items-center justify-center mx-auto text-center ${compact ? "space-y-4 max-w-[280px]" : "space-y-8 max-w-xl"} py-6`}>
+              <div className={`rounded-2xl bg-card border border-border flex items-center justify-center text-muted-foreground shadow-lg relative group transition-all duration-300 hover:border-border/80 ${compact ? "h-11 w-11" : "h-16 w-16"}`}>
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Sparkles className={compact ? "h-5 w-5 text-foreground/90" : "h-7 w-7 text-foreground/90"} />
+              </div>
+              
+              <div className="space-y-1">
+                <h2 className={`${compact ? "text-xs font-bold" : "text-3xl font-extrabold"} font-serif text-foreground tracking-tight leading-tight`}>
+                  Argon Assistant
+                </h2>
+                {!compact && (
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    Query your cached correspondence, draft response text, check calendar conflicts, or trigger direct event creation via command parameters.
+                  </p>
+                )}
+              </div>
+
+              {!compact && (
+                <div className="grid gap-3 w-full pt-4">
+                  {[
+                    "Summarize my recent Gmail messages",
+                    "Do I have any calendar conflicts tomorrow?",
+                    "Schedule a 30m slot with team next Monday",
+                  ].map((promptText, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setInput(promptText)}
+                      className="group p-4 flex items-center justify-between text-left rounded-xl border border-border/80 bg-card/35 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 transition-all duration-200 font-semibold shadow-sm cursor-pointer"
+                    >
+                      <span>{promptText}</span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/80 group-hover:text-foreground group-hover:translate-x-1 transition-all duration-200" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={`${compact ? "w-full" : "max-w-2xl mx-auto"} space-y-4`}>
+              {messages
+                .filter(m => getMessageText(m).trim() !== "" || m.role === "user")
+                .map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex gap-3 items-start ${m.role === "user" ? "flex-row-reverse" : ""}`}
+                >
+                  <div className={`h-6 w-6 rounded-full shrink-0 flex items-center justify-center text-[10px] font-semibold shadow-sm ${
+                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary border border-border text-foreground/90"
+                  }`}>
+                    {m.role === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3 text-muted-foreground/80" />}
+                  </div>
+                  <div className={`rounded-xl px-3 py-2 max-w-[90%] text-xs leading-relaxed ${
+                    m.role === "user" 
+                      ? "bg-primary/90 text-primary-foreground font-medium animate-in fade-in slide-in-from-bottom-2 duration-300" 
+                      : "bg-card border border-border/50 text-foreground animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  }`}>
+                    {m.role === "user" ? (
+                      <div className="whitespace-pre-wrap">{getMessageText(m)}</div>
+                    ) : (
+                      <>
+                        <MarkdownMessage content={getMessageText(m)} />
+                        
+                        {/* Custom tool card rendering */}
+                        {(m as any).toolInvocations && (m as any).toolInvocations.map((toolInvocation: any) => {
+                          const { toolCallId, toolName, result, args } = toolInvocation;
+                          
+                          if (toolName === 'draft_email') {
+                            return (
+                              <EmailDraftCard
+                                key={toolCallId}
+                                to={args.to}
+                                subject={args.subject}
+                                body={args.body}
+                                threadId={args.threadId}
+                                toolCallId={toolCallId}
+                                addToolResult={addToolResult}
+                              />
+                            );
+                          }
+                          
+                          if (toolName === 'draft_calendar_event') {
+                            return (
+                              <CalendarDraftCard
+                                key={toolCallId}
+                                title={args.title}
+                                startTime={args.startTime}
+                                endTime={args.endTime}
+                                attendees={args.attendees || []}
+                                toolCallId={toolCallId}
+                                addToolResult={addToolResult}
+                              />
+                            );
+                          }
+
+                          if (toolName === 'run_script' && result) {
+                            const list = Array.isArray(result) ? result : Array.isArray(result.emails) ? result.emails : [];
+                            if (list.length > 0 && (list[0].subject || list[0].sender || list[0].from || list[0].snippet)) {
+                              return (
+                                <div key={toolCallId} className="mt-3 space-y-2 w-full text-left">
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Found Emails:</p>
+                                  {list.map((email: any, idx: number) => {
+                                    const subject = email.subject || 'No Subject';
+                                    const sender = email.sender || email.from || 'Unknown Sender';
+                                    const snippet = email.snippet || '';
+                                    const threadId = email.threadId || '';
+                                    return (
+                                      <div key={idx} className="p-3 rounded-xl border border-border/85 bg-card/45 hover:bg-card/90 transition flex flex-col gap-2 shadow-sm select-text">
+                                        <div>
+                                          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase block">Sender</span>
+                                          <span className="text-xs font-bold text-foreground">{sender}</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase block">Subject</span>
+                                          <span className="text-xs font-extrabold text-foreground">{subject}</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase block">Snippet</span>
+                                          <span className="text-xs text-muted-foreground leading-relaxed">{snippet}</span>
+                                        </div>
+                                        <div className="flex justify-end pt-1">
+                                          <Button
+                                            size="sm"
+                                            onClick={() => {
+                                              setInput(`Reply to email: "${subject}" from "${sender}" (threadId: ${threadId})`);
+                                            }}
+                                            className="text-[9px] h-6 px-2 bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-lg flex items-center gap-1 cursor-pointer"
+                                          >
+                                            <Edit3 className="h-2.5 w-2.5" />
+                                            <span>Reply</span>
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            }
+                          }
+                          
+                          return null;
+                        })}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                (() => {
+                  const visibleMessages = messages.filter(m => getMessageText(m).trim() !== "" || m.role === "user");
+                  const lastVisible = visibleMessages[visibleMessages.length - 1];
+                  return !lastVisible || lastVisible.role !== "assistant";
+                })()
+              ) && (
+                <div className="flex gap-3.5 items-start">
+                  <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground/90">
+                    <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />
+                  </div>
+                  <div className="rounded-2xl px-3 py-1.5 bg-card border border-border/50 text-muted-foreground text-[10px] flex items-center gap-1.5">
+                    <RefreshCw className="h-2.5 w-2.5 animate-spin text-muted-foreground/60" />
+                    <span>Argon is On it...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Chat Input form */}
+        <div className={`border-t border-border bg-background/85 backdrop-blur-sm shrink-0 ${compact ? "p-3" : "p-4"}`}>
+          <form 
+            onSubmit={handleChatSubmit}
+            className="w-full max-w-2xl mx-auto relative flex items-center bg-card border border-border rounded-xl px-2.5 py-1 hover:border-border/80 focus-within:border-border transition-all shadow-inner"
+          >
+            <input 
+              type="text" 
+              placeholder={compact ? "Ask Argon assistant..." : "Ask AI assistant to search mail or book meetings..."}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="w-full bg-transparent text-xs text-foreground placeholder-muted-foreground py-2 pl-3 pr-20 focus:outline-none focus:ring-0"
+            />
+            <div className="absolute right-2 flex items-center gap-1.5 z-10">
+              <button
+                type="button"
+                onClick={toggleListening}
+                title="Voice input"
+                className={`p-1.5 rounded-xl transition-all cursor-pointer shadow-sm ${
+                  isListening ? "bg-red-500 text-white animate-pulse" : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                }`}
+              >
+                {isListening ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="p-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 disabled:hover:bg-primary transition-all cursor-pointer shadow-sm animate-in fade-in"
+              >
+                <Send className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex h-screen bg-background text-foreground font-sans overflow-hidden">
       
@@ -1430,259 +1667,200 @@ export function WorkspaceClient({
           )}
 
           {/* A. AI ASSISTANT VIEWPORT */}
-          {activeTab === "chat" && !showSearchResults && (
-            <div className="h-full flex flex-col justify-between">
-              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-                {messages.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center max-w-xl mx-auto text-center space-y-8 py-10">
-                    <div className="h-16 w-16 rounded-2xl bg-card border border-border flex items-center justify-center text-muted-foreground shadow-lg relative group transition-all duration-300 hover:border-border/80">
-                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Sparkles className="h-7 w-7 text-foreground/90" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h2 className="text-3xl font-extrabold font-serif text-foreground tracking-tight leading-tight">
-                        Workspace AI Assistant
-                      </h2>
-                      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                        Query your cached correspondence, draft response text, check calendar conflicts, or trigger direct event creation via command parameters.
-                      </p>
-                    </div>
+          {activeTab === "chat" && !showSearchResults && renderAssistantChat(false)}
 
-                    <div className="grid gap-3 w-full pt-4">
-                      {[
-                        "Summarize my recent Gmail messages",
-                        "Do I have any calendar conflicts tomorrow?",
-                        "Schedule a 30m slot with team next Monday",
-                      ].map((promptText, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setInput(promptText)}
-                          className="group p-4 flex items-center justify-between text-left rounded-xl border border-border/80 bg-card/35 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 transition-all duration-200 font-semibold shadow-sm cursor-pointer"
-                        >
-                          <span>{promptText}</span>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground/80 group-hover:text-foreground group-hover:translate-x-1 transition-all duration-200" />
-                        </button>
-                      ))}
+          {activeTab === "inbox" && !showSearchResults && (
+            <div className="flex h-full divide-x divide-border/60 overflow-hidden w-full">
+              {/* Email List Column */}
+              <div className={`overflow-y-auto p-4 space-y-3 shrink-0 transition-all ${
+                selectedEmail ? "w-[360px]" : "flex-1"
+              }`}>
+                {emailsLoading ? (
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-24">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Loading Gmail cache...</span>
+                  </div>
+                ) : emails.length === 0 ? (
+                  <div className="text-center py-24 space-y-3">
+                    <div className="h-14 w-14 rounded-2xl bg-muted/50 border border-border flex items-center justify-center mx-auto">
+                      <Inbox className="h-7 w-7 text-muted-foreground/50" />
                     </div>
+                    <p className="text-sm font-semibold text-foreground/60">No emails synced</p>
+                    <p className="text-xs text-muted-foreground">Connect Gmail to sync your inbox cache.</p>
                   </div>
                 ) : (
-                  <div className="max-w-2xl mx-auto space-y-6">
-                    {messages
-                      .filter(m => getMessageText(m).trim() !== "" || m.role === "user")
-                      .map((m) => (
-                      <div
-                        key={m.id}
-                        className={`flex gap-3.5 items-start ${m.role === "user" ? "flex-row-reverse" : ""}`}
-                      >
-                        <div className={`h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold shadow-sm ${
-                          m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary border border-border text-foreground/90"
-                        }`}>
-                          {m.role === "user" ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />}
-                        </div>
-                        <div className={`rounded-2xl px-4 py-3.5 max-w-[85%] text-sm leading-relaxed ${
-                          m.role === "user" ? "bg-primary/90 text-primary-foreground font-medium animate-in fade-in slide-in-from-bottom-2 duration-300" : "bg-card border border-border/50 text-foreground animate-in fade-in slide-in-from-bottom-2 duration-300"
-                        }`}>
-                          {m.role === "user" ? (
-                            <div className="whitespace-pre-wrap">{getMessageText(m)}</div>
-                          ) : (
-                            <>
-                              <MarkdownMessage content={getMessageText(m)} />
-                              
-                              {/* Custom tool card rendering */}
-                              {(m as any).toolInvocations && (m as any).toolInvocations.map((toolInvocation: any) => {
-                                const { toolCallId, toolName, result, args } = toolInvocation;
-                                
-                                if (toolName === 'draft_email') {
-                                  return (
-                                    <EmailDraftCard
-                                      key={toolCallId}
-                                      to={args.to}
-                                      subject={args.subject}
-                                      body={args.body}
-                                      threadId={args.threadId}
-                                      toolCallId={toolCallId}
-                                      addToolResult={addToolResult}
-                                    />
-                                  );
-                                }
-                                
-                                if (toolName === 'draft_calendar_event') {
-                                  return (
-                                    <CalendarDraftCard
-                                      key={toolCallId}
-                                      title={args.title}
-                                      startTime={args.startTime}
-                                      endTime={args.endTime}
-                                      attendees={args.attendees || []}
-                                      toolCallId={toolCallId}
-                                      addToolResult={addToolResult}
-                                    />
-                                  );
-                                }
-
-                                if (toolName === 'run_script' && result) {
-                                  const list = Array.isArray(result) ? result : Array.isArray(result.emails) ? result.emails : [];
-                                  if (list.length > 0 && (list[0].subject || list[0].sender || list[0].from || list[0].snippet)) {
-                                    return (
-                                      <div key={toolCallId} className="mt-3 space-y-2 w-full max-w-xl text-left">
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Found Emails:</p>
-                                        {list.map((email: any, idx: number) => {
-                                          const subject = email.subject || 'No Subject';
-                                          const sender = email.sender || email.from || 'Unknown Sender';
-                                          const snippet = email.snippet || '';
-                                          const threadId = email.threadId || '';
-                                          return (
-                                            <div key={idx} className="p-3.5 rounded-xl border border-border/85 bg-card/45 hover:bg-card/90 transition flex flex-col gap-2 shadow-sm select-text">
-                                              <div>
-                                                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase block">Sender</span>
-                                                <span className="text-xs font-bold text-foreground">{sender}</span>
-                                              </div>
-                                              <div>
-                                                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase block">Subject</span>
-                                                <span className="text-xs font-extrabold text-foreground">{subject}</span>
-                                              </div>
-                                              <div>
-                                                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase block">Snippet</span>
-                                                <span className="text-xs text-muted-foreground leading-relaxed">{snippet}</span>
-                                              </div>
-                                              <div className="flex justify-end pt-1">
-                                                <Button
-                                                  size="sm"
-                                                  onClick={() => {
-                                                    setInput(`Reply to email: "${subject}" from "${sender}" (threadId: ${threadId})`);
-                                                  }}
-                                                  className="text-[10px] h-7 px-3 bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-lg flex items-center gap-1 cursor-pointer"
-                                                >
-                                                  <Edit3 className="h-3 w-3" />
-                                                  <span>Reply</span>
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    );
-                                  }
-                                }
-                                
-                                return null;
-                              })}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {isLoading && (
-                      (() => {
-                        const visibleMessages = messages.filter(m => getMessageText(m).trim() !== "" || m.role === "user");
-                        const lastVisible = visibleMessages[visibleMessages.length - 1];
-                        return !lastVisible || lastVisible.role !== "assistant";
-                      })()
-                    ) && (
-                      <div className="flex gap-3.5 items-start">
-                        <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground/90">
-                          <Bot className="h-3.5 w-3.5 text-muted-foreground/80" />
-                        </div>
-                        <div className="rounded-2xl px-4 py-2 bg-card border border-border/50 text-muted-foreground text-[11px] flex items-center gap-2">
-                          <RefreshCw className="h-3 w-3 animate-spin text-muted-foreground/60" />
-                          <span>Argon is On it...</span>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
+                  <div className="space-y-1.5">
+                    {emails.map((email) => {
+                      const initials = email.sender.split(" ").slice(0,2).map(w => w[0]).join("").toUpperCase();
+                      const colors = ["bg-red-500","bg-blue-500","bg-emerald-500","bg-violet-500","bg-amber-500","bg-pink-500"];
+                      const color = colors[email.sender.charCodeAt(0) % colors.length];
+                      return (
+                        <button
+                          key={email.id}
+                          onClick={() => {
+                            setSelectedEmail(email);
+                            setAiSummary("");
+                            setAiDraft("");
+                          }}
+                          className={`w-full p-3 flex items-start gap-2.5 text-left rounded-xl border transition-all ${
+                            selectedEmail?.id === email.id 
+                              ? "bg-accent border-primary/30 shadow-sm" 
+                              : "bg-card/60 border-border/60 hover:bg-muted/60 hover:border-border"
+                          }`}
+                        >
+                          <div className={`h-8 w-8 rounded-full ${color} flex items-center justify-center text-[10px] font-bold text-white shrink-0 shadow-sm`}>
+                            {initials || "?"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                              <span className="text-xs font-bold text-foreground truncate">{email.sender}</span>
+                              <span className="text-[9px] text-muted-foreground shrink-0">
+                                {new Date(email.receivedAt).toLocaleDateString([], { month:'short', day:'numeric' })}
+                              </span>
+                            </div>
+                            <span className="text-xs font-semibold text-foreground/80 block truncate">{email.subject}</span>
+                            <span className="text-[10px] text-muted-foreground/70 line-clamp-1 leading-relaxed">{email.snippet}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
-              {/* Chat Input form */}
-              <div className="p-4 border-t border-border bg-background/80 backdrop-blur-sm shrink-0">
-                <form 
-                  onSubmit={handleChatSubmit}
-                  className="max-w-2xl mx-auto relative flex items-center bg-card border border-border rounded-xl px-3.5 py-1.5 hover:border-border/80 focus-within:border-border transition-all shadow-inner"
-                >
-                  <input 
-                    type="text" 
-                    placeholder="Ask AI assistant to search mail or book meetings..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="w-full bg-transparent text-sm text-foreground placeholder-muted-foreground py-2.5 pl-4 pr-24 focus:outline-none focus:ring-0"
-                  />
-                  <div className="absolute right-3 flex items-center gap-2 z-10">
-                    <button
-                      type="button"
-                      onClick={toggleListening}
-                      title="Voice input"
-                      className={`p-1.5 rounded-xl transition-all cursor-pointer shadow-sm ${
-                        isListening ? "bg-red-500 text-white animate-pulse" : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      }`}
+              {/* Email Details Column */}
+              {selectedEmail && (
+                <div className="flex-1 overflow-y-auto p-6 bg-card/10 select-text flex flex-col gap-6">
+                  <div className="flex justify-between items-center pb-3 border-b border-border/60">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Email Details</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedEmail(null)}
+                      className="text-xs hover:bg-muted text-muted-foreground shrink-0 cursor-pointer h-8"
                     >
-                      {isListening ? <Mic className="h-4.5 w-4.5" /> : <MicOff className="h-4.5 w-4.5" />}
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isLoading || !input.trim()}
-                      className="p-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 disabled:hover:bg-primary transition-all cursor-pointer shadow-sm animate-in fade-in"
-                    >
-                      <Send className="h-4.5 w-4.5" />
-                    </button>
+                      Close Details
+                    </Button>
                   </div>
-                </form>
-              </div>
-            </div>
-          )}
 
-          {activeTab === "inbox" && !showSearchResults && (
-            <div className="p-4 space-y-3">
-              {emailsLoading ? (
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-24">
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Loading Gmail cache...</span>
-                </div>
-              ) : emails.length === 0 ? (
-                <div className="text-center py-24 space-y-3">
-                  <div className="h-14 w-14 rounded-2xl bg-muted/50 border border-border flex items-center justify-center mx-auto">
-                    <Inbox className="h-7 w-7 text-muted-foreground/50" />
-                  </div>
-                  <p className="text-sm font-semibold text-foreground/60">No emails synced</p>
-                  <p className="text-xs text-muted-foreground">Connect Gmail to sync your inbox cache.</p>
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {emails.map((email) => {
-                    const initials = email.sender.split(" ").slice(0,2).map(w => w[0]).join("").toUpperCase();
-                    const colors = ["bg-red-500","bg-blue-500","bg-emerald-500","bg-violet-500","bg-amber-500","bg-pink-500"];
-                    const color = colors[email.sender.charCodeAt(0) % colors.length];
-                    return (
-                      <button
-                        key={email.id}
-                        onClick={() => {
-                          setSelectedEmail(email);
-                          setAiSummary("");
-                          setAiDraft("");
-                        }}
-                        className={`w-full p-3.5 flex items-start gap-3 text-left rounded-xl border transition-all ${
-                          selectedEmail?.id === email.id 
-                            ? "bg-accent border-primary/30 shadow-sm" 
-                            : "bg-card/60 border-border/60 hover:bg-muted/60 hover:border-border"
-                        }`}
-                      >
-                        <div className={`h-9 w-9 rounded-full ${color} flex items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm`}>
-                          {initials || "?"}
+                  <div className="space-y-6">
+                    {/* Details content */}
+                    <div className="p-5 rounded-2xl border border-border bg-card/50 space-y-4 shadow-xl select-text">
+                      <div>
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Sender</span>
+                        <p className="text-sm font-bold text-foreground break-words leading-snug">{selectedEmail.sender}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Subject</span>
+                        <p className="text-base font-extrabold text-foreground leading-snug break-words">{selectedEmail.subject}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Received</span>
+                        <p className="text-xs text-muted-foreground font-medium">{new Date(selectedEmail.receivedAt).toLocaleString()}</p>
+                      </div>
+                      <div className="pt-4 border-t border-border/60">
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-2">{selectedEmail.body ? "Message Content" : "Snippet"}</span>
+                        <div className="text-sm text-foreground/90 leading-relaxed break-words whitespace-pre-wrap select-text max-h-[300px] overflow-y-auto pr-1">
+                          {selectedEmail.body || selectedEmail.snippet}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2 mb-0.5">
-                            <span className="text-xs font-bold text-foreground truncate">{email.sender}</span>
-                            <span className="text-[10px] text-muted-foreground shrink-0">
-                              {new Date(email.receivedAt).toLocaleDateString([], { month:'short', day:'numeric' })}
-                            </span>
+                      </div>
+                    </div>
+
+                    {/* AI Actions in details column */}
+                    <div className="space-y-5 pt-4 border-t border-border/60">
+                      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">AI Assistant Actions</h4>
+                      
+                      {/* Summary action */}
+                      <div className="space-y-2">
+                        <Button 
+                          onClick={() => handleSummarizeEmail(selectedEmail.gmailId)}
+                          disabled={aiSummaryLoading}
+                          className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
+                        >
+                          {aiSummaryLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-primary" />}
+                          <span>Generate Bullet Summary</span>
+                        </Button>
+
+                        {aiSummary && (
+                          <div className="p-4 rounded-2xl border border-border bg-card/35 text-sm text-foreground/90 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner animate-in fade-in duration-200">
+                            <button 
+                              onClick={() => copyToClipboard(aiSummary)}
+                              className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors cursor-pointer"
+                              title="Copy Summary"
+                            >
+                              <Clipboard className="h-4 w-4" />
+                            </button>
+                            <strong className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block pb-2">AI Summary</strong>
+                            {aiSummary}
                           </div>
-                          <span className="text-xs font-semibold text-foreground/80 block truncate">{email.subject}</span>
-                          <span className="text-[11px] text-muted-foreground/70 line-clamp-1 leading-relaxed">{email.snippet}</span>
+                        )}
+                      </div>
+
+                      {/* AI drafting replies */}
+                      <div className="space-y-3.5 pt-4 border-t border-border">
+                        <div className="space-y-1.5">
+                          <span className="text-xs font-semibold text-muted-foreground block">Drafting instructions (optional)</span>
+                          <input 
+                            type="text" 
+                            placeholder="e.g., politely decline, ask to reschedule..." 
+                            value={draftInstructions}
+                            onChange={(e) => setDraftInstructions(e.target.value)}
+                            className="w-full bg-background border border-border rounded-xl p-3 h-10 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80 focus:ring-1 focus:ring-ring"
+                          />
                         </div>
-                      </button>
-                    );
-                  })}
+
+                        <Button 
+                          onClick={() => handleDraftReply(selectedEmail.gmailId)}
+                          disabled={aiDraftLoading}
+                          className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
+                        >
+                          {aiDraftLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Edit3 className="h-4 w-4 text-foreground/80" />}
+                          <span>Generate Response Draft</span>
+                        </Button>
+
+                        {aiDraft && (
+                          <div className="space-y-3.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div className="relative">
+                              <textarea
+                                value={aiDraft}
+                                onChange={(e) => setAiDraft(e.target.value)}
+                                rows={8}
+                                className="w-full bg-background border border-border rounded-xl p-3.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80 focus:ring-1 focus:ring-ring select-text leading-relaxed resize-y shadow-inner"
+                                placeholder="Edit the reply draft here..."
+                              />
+                              <button 
+                                onClick={() => copyToClipboard(aiDraft)}
+                                className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                                title="Copy Draft"
+                              >
+                                <Clipboard className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            {inboxReplyStatus && (
+                              <div className={`p-3 rounded-xl border text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
+                                inboxReplyStatus.type === 'success' 
+                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                                  : 'bg-destructive/10 border-destructive/20 text-destructive'
+                              }`}>
+                                {inboxReplyStatus.type === 'success' ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                                <span>{inboxReplyStatus.message}</span>
+                              </div>
+                            )}
+
+                            <Button
+                              onClick={handleSendInboxReply}
+                              disabled={sendingInboxReply}
+                              className="w-full bg-primary hover:bg-primary/95 text-primary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 rounded-xl font-bold shadow-md cursor-pointer transition-all duration-200 active:scale-[0.98]"
+                            >
+                              {sendingInboxReply ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                              <span>Send Reply</span>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -1870,235 +2048,111 @@ export function WorkspaceClient({
         </div>
       </section>
 
-      {/* 3. RIGHT COLUMN: Context panels */}
+      {/* 3. RIGHT COLUMN: Persistent AI Assistant Sidecar */}
       {activeTab !== "chat" && (
-        <section className={`${activeTab === "inbox" ? "w-[400px]" : "w-80"} bg-card/40 flex flex-col overflow-y-auto shrink-0 p-5 space-y-6 border-l border-border/60`}>
-          
-          {/* B. CONTEXT: INBOX TAB */}
-          {activeTab === "inbox" && (
-            <div className="space-y-6">
-              <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">Email Details</h3>
-              
-              {!selectedEmail ? (
-                <div className="text-center py-16 space-y-3">
-                  <FileText className="h-10 w-10 text-muted-foreground/60 mx-auto" />
-                  <p className="text-sm text-muted-foreground font-medium">Select an email from the inbox list to read details.</p>
+        <section className="w-[380px] flex flex-col overflow-hidden shrink-0 border-l border-border/60 bg-card/25">
+          {activeTab === "inbox" && renderAssistantChat(true)}
+
+          {activeTab === "calendar" && (
+            calendarRightPanelMode === "assistant" ? (
+              renderAssistantChat(true)
+            ) : (
+              <div className="flex-1 overflow-y-auto p-5 space-y-6 select-text">
+                <div className="flex items-center justify-between pb-3 border-b border-border/50">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-foreground font-serif">Manual Scheduler</h3>
+                    <p className="text-[10px] text-muted-foreground/60">Schedule Google calendar events manually.</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCalendarRightPanelMode("assistant")}
+                    className="text-[10px] h-7 px-2 hover:bg-muted text-muted-foreground cursor-pointer flex items-center gap-1"
+                  >
+                    <Bot className="h-3.5 w-3.5 text-primary animate-pulse" />
+                    <span>Use Assistant</span>
+                  </Button>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  
-                  {/* Details layout - premium card */}
-                  <div className="p-5 rounded-2xl border border-border bg-card/50 space-y-4 shadow-xl select-text">
-                    <div>
-                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Sender</span>
-                      <p className="text-sm font-bold text-foreground break-words leading-snug">{selectedEmail.sender}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Subject</span>
-                      <p className="text-base font-extrabold text-foreground leading-snug break-words">{selectedEmail.subject}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-1">Received</span>
-                      <p className="text-sm text-muted-foreground font-medium">{new Date(selectedEmail.receivedAt).toLocaleString()}</p>
-                    </div>
-                    <div className="pt-4 border-t border-border/60">
-                      <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block mb-2">{selectedEmail.body ? "Message Content" : "Snippet"}</span>
-                      <div className="text-sm text-foreground/90 leading-relaxed break-words select-text whitespace-pre-wrap max-h-[300px] overflow-y-auto pr-1">
-                        {selectedEmail.body || selectedEmail.snippet}
-                      </div>
-                    </div>
+
+                {/* Event Form creation */}
+                <form onSubmit={handleCreateEvent} className="p-4 rounded-xl border border-border bg-card/25 space-y-4 text-xs">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Meeting Title *</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. Sync with HR, Review roadmap..."
+                      value={eventTitle}
+                      onChange={(e) => setEventTitle(e.target.value)}
+                      className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
+                    />
                   </div>
 
-                  {/* AI Actions */}
-                  <div className="space-y-5">
-                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">AI Assistant Actions</h4>
-                    
-                    {/* Summary action */}
-                    <div className="space-y-2">
-                      <Button 
-                        onClick={() => handleSummarizeEmail(selectedEmail.gmailId)}
-                        disabled={aiSummaryLoading}
-                        className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
-                      >
-                        {aiSummaryLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-primary animate-pulse" />}
-                        <span>Generate Bullet Summary</span>
-                      </Button>
-
-                      {aiSummary && (
-                        <div className="p-4 rounded-2xl border border-border bg-card/35 text-sm text-foreground/90 leading-relaxed relative whitespace-pre-wrap select-text shadow-inner">
-                          <button 
-                            onClick={() => copyToClipboard(aiSummary)}
-                            className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors cursor-pointer"
-                            title="Copy Summary"
-                          >
-                            <Clipboard className="h-4 w-4" />
-                          </button>
-                          <strong className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider block pb-2">AI Summary</strong>
-                          {aiSummary}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* AI drafting replies */}
-                    <div className="space-y-3.5 pt-4 border-t border-border">
-                      <div className="space-y-1.5">
-                        <span className="text-xs font-semibold text-muted-foreground block">Drafting instructions (optional)</span>
-                        <input 
-                          type="text" 
-                          placeholder="e.g., politely decline, ask to reschedule..." 
-                          value={draftInstructions}
-                          onChange={(e) => setDraftInstructions(e.target.value)}
-                          className="w-full bg-background border border-border rounded-xl p-3 h-10 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80 focus:ring-1 focus:ring-ring"
-                        />
-                      </div>
-
-                      <Button 
-                        onClick={() => handleDraftReply(selectedEmail.gmailId)}
-                        disabled={aiDraftLoading}
-                        className="w-full bg-secondary hover:bg-muted text-secondary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 border border-border rounded-xl cursor-pointer"
-                      >
-                        {aiDraftLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Edit3 className="h-4 w-4 text-foreground/80" />}
-                        <span>Generate Response Draft</span>
-                      </Button>
-
-                      {aiDraft && (
-                        <div className="space-y-3.5 animate-in fade-in slide-in-from-top-2 duration-200">
-                          <div className="relative">
-                            <textarea
-                              value={aiDraft}
-                              onChange={(e) => setAiDraft(e.target.value)}
-                              rows={8}
-                              className="w-full bg-background border border-border rounded-xl p-3.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80 focus:ring-1 focus:ring-ring select-text leading-relaxed resize-y shadow-inner"
-                              placeholder="Edit the reply draft here..."
-                            />
-                            <button 
-                              onClick={() => copyToClipboard(aiDraft)}
-                              className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                              title="Copy Draft"
-                            >
-                              <Clipboard className="h-4 w-4" />
-                            </button>
-                          </div>
-
-                          {inboxReplyStatus && (
-                            <div className={`p-3 rounded-xl border text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
-                              inboxReplyStatus.type === 'success' 
-                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
-                                : 'bg-destructive/10 border-destructive/20 text-destructive'
-                            }`}>
-                              {inboxReplyStatus.type === 'success' ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                              <span>{inboxReplyStatus.message}</span>
-                            </div>
-                          )}
-
-                          <Button
-                            onClick={handleSendInboxReply}
-                            disabled={sendingInboxReply}
-                            className="w-full bg-primary hover:bg-primary/95 text-primary-foreground text-xs py-2 h-10 flex items-center justify-center gap-1.5 rounded-xl font-bold shadow-md cursor-pointer transition-all duration-200 active:scale-[0.98]"
-                          >
-                            {sendingInboxReply ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            <span>Send Reply</span>
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Start Time *</label>
+                    <input 
+                      type="datetime-local" 
+                      required
+                      value={eventStart}
+                      onChange={(e) => setEventStart(e.target.value)}
+                      className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
+                    />
                   </div>
 
-                </div>
-              )}
-            </div>
-        )}
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">End Time *</label>
+                    <input 
+                      type="datetime-local" 
+                      required
+                      value={eventEnd}
+                      onChange={(e) => setEventEnd(e.target.value)}
+                      className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
+                    />
+                  </div>
 
-        {/* C. CONTEXT: CALENDAR TAB */}
-        {activeTab === "calendar" && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="space-y-1">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Visual Scheduler</h3>
-              <p className="text-[11px] text-muted-foreground/60">Create new Google calendar events dynamically.</p>
-            </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Guests (comma-separated)</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. john@domain.com, team@locus.co"
+                      value={eventGuests}
+                      onChange={(e) => setEventGuests(e.target.value)}
+                      className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
+                    />
+                  </div>
 
-            {/* Event Form creation */}
-            <form onSubmit={handleCreateEvent} className="p-4 rounded-xl border border-border bg-card/25 space-y-4 text-xs">
-              <h4 className="text-xs font-bold text-foreground font-serif">Schedule Meeting</h4>
+                  {eventStatus && (
+                    <div className={`p-2.5 rounded-lg border text-[11px] leading-relaxed ${
+                      eventStatus.type === "success" 
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                        : "bg-destructive/10 border-destructive/20 text-destructive"
+                    }`}>
+                      {eventStatus.message}
+                    </div>
+                  )}
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Meeting Title *</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="e.g. Sync with HR, Review roadmap..."
-                  value={eventTitle}
-                  onChange={(e) => setEventTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
-                />
+                  <Button 
+                    type="submit"
+                    disabled={eventCreating}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs py-1.5 font-bold rounded-lg flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    {eventCreating ? (
+                      <>
+                        <RefreshCw className="h-3 w-3 animate-spin" />
+                        <span>Booking...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Calendar className="h-3.5 w-3.5 text-primary-foreground" />
+                        <span>Post Event</span>
+                      </>
+                    )}
+                  </Button>
+                </form>
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Start Time *</label>
-                <input 
-                  type="datetime-local" 
-                  required
-                  value={eventStart}
-                  onChange={(e) => setEventStart(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">End Time *</label>
-                <input 
-                  type="datetime-local" 
-                  required
-                  value={eventEnd}
-                  onChange={(e) => setEventEnd(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground focus:outline-none focus:border-border/80"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] text-muted-foreground/85 font-bold uppercase block">Guests (comma-separated)</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. john@domain.com, team@locus.co"
-                  value={eventGuests}
-                  onChange={(e) => setEventGuests(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg p-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-border/80"
-                />
-              </div>
-
-              {eventStatus && (
-                <div className={`p-2.5 rounded-lg border text-[11px] leading-relaxed ${
-                  eventStatus.type === "success" 
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
-                    : "bg-destructive/10 border-destructive/20 text-destructive"
-                }`}>
-                  {eventStatus.message}
-                </div>
-              )}
-
-              <Button 
-                type="submit"
-                disabled={eventCreating}
-                size="xs"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs py-1.5 font-bold rounded-lg flex items-center justify-center gap-1 cursor-pointer animate-in fade-in"
-              >
-                {eventCreating ? (
-                  <>
-                    <RefreshCw className="h-3 w-3 animate-spin" />
-                    <span>Booking...</span>
-                  </>
-                ) : (
-                  <>
-                    <Calendar className="h-3.5 w-3.5 text-primary-foreground" />
-                    <span>Post Event</span>
-                  </>
-                )}
-              </Button>
-            </form>
-          </div>
+            )
           )}
-
         </section>
       )}
 
