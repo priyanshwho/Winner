@@ -140,14 +140,14 @@ export default function Footer() {
       <div className="relative z-10 grid w-full gap-8 xl:grid-cols-3 xl:gap-8 items-start">
         <AnimatedContainer className="space-y-4">
           <Link href="/" className="flex items-center select-none -mt-8">
-            <img src="/BL-ARGON.png" alt="ArgonAI" className="dark:hidden h-20 w-auto" />
-            <img src="/WL-ARGON.png" alt="ArgonAI" className="hidden dark:block h-20 w-auto" />
+            <img src="/BL-ARGON.png" alt="ARGON AI" className="dark:hidden h-20 w-auto" />
+            <img src="/WL-ARGON.png" alt="ARGON AI" className="hidden dark:block h-20 w-auto" />
           </Link>
           <p className="text-muted-foreground mt-2 text-sm font-sans max-w-xs leading-relaxed">
             AI-powered command center for Gmail and Google Calendar. Secure, multi-tenant workspace sync.
           </p>
           <p className="text-muted-foreground mt-4 text-xs font-mono">
-            © {new Date().getFullYear()} ArgonAI. All rights reserved.
+            © {new Date().getFullYear()} ARGON AI. All rights reserved.
           </p>
         </AnimatedContainer>
 
@@ -157,17 +157,52 @@ export default function Footer() {
               <div className="mb-10 md:mb-0">
                 <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-primary">{section.label}</h3>
                 <ul className="text-muted-foreground mt-4 space-y-2 text-sm font-sans">
-                  {section.links.map((link) => (
-                    <li key={link.title}>
-                      <a
-                        href={link.href}
-                        className="hover:text-primary inline-flex items-center transition-all duration-300 gap-1.5"
-                      >
-                        {link.icon && <link.icon className="size-4 shrink-0" />}
-                        <span>{link.title}</span>
-                      </a>
-                    </li>
-                  ))}
+                  {section.links.map((link) => {
+                    const isExternal = link.href.startsWith("http");
+                    const isHash = link.href.startsWith("#");
+                    
+                    if (isExternal) {
+                      return (
+                        <li key={link.title}>
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-primary inline-flex items-center transition-all duration-300 gap-1.5"
+                          >
+                            {link.icon && <link.icon className="size-4 shrink-0" />}
+                            <span>{link.title}</span>
+                          </a>
+                        </li>
+                      );
+                    }
+                    
+                    if (isHash) {
+                      return (
+                        <li key={link.title}>
+                          <a
+                            href={link.href}
+                            className="hover:text-primary inline-flex items-center transition-all duration-300 gap-1.5"
+                          >
+                            {link.icon && <link.icon className="size-4 shrink-0" />}
+                            <span>{link.title}</span>
+                          </a>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={link.title}>
+                        <Link
+                          href={link.href}
+                          className="hover:text-primary inline-flex items-center transition-all duration-300 gap-1.5"
+                        >
+                          {link.icon && <link.icon className="size-4 shrink-0" />}
+                          <span>{link.title}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </AnimatedContainer>
