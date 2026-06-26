@@ -236,7 +236,7 @@ html, body {
 .landing-page-container .header h1 {
   font-family: 'Audiowide', cursive;
   text-transform: uppercase;
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-size: clamp(3rem, 7.5vw, 6.5rem);
   line-height: 1.1;
   letter-spacing: 0.05em;
 }
@@ -527,7 +527,7 @@ html, body {
 /* Custom Font Styling for Subhero and Welcome Label */
 .landing-page-container .welcome-label {
   font-family: 'Audiowide', cursive !important;
-  font-size: clamp(1rem, 2.2vw, 1.8rem) !important;
+  font-size: clamp(1.2rem, 2.6vw, 2.2rem) !important;
   letter-spacing: 0.15em !important;
   text-transform: uppercase !important;
   margin-bottom: 0.75rem !important;
@@ -535,12 +535,12 @@ html, body {
 
 .landing-page-container .subhero-text {
   font-family: 'Istok Web', sans-serif !important;
-  font-size: clamp(1.1rem, 2vw, 1.6rem) !important;
+  font-size: clamp(1.3rem, 2.5vw, 2.0rem) !important;
   font-weight: 500 !important;
   line-height: 1.4 !important;
   letter-spacing: 0.01em !important;
   margin-top: 0.5rem !important;
   margin-bottom: 0.5rem !important;
-  max-width: 650px !important;
+  max-width: 750px !important;
   text-align: center !important;
 }

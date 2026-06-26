@@ -530,39 +530,47 @@ export default function LandingClient() {
           </ImageTrail>
         </div>
 
-        {/* 3. Welcome label + Main Header */}
-        <div className="header z-10">
-          <span className="welcome-label text-xs md:text-sm uppercase tracking-[0.3em] text-foreground/60 mb-2 select-none block">Welcome to</span>
-          <Link href="/sign-in" className="cursor-pointer">
-            <h1>ARGON AI</h1>
-          </Link>
-        </div>
+        {/* Main Content Wrapper to shift everything up closer to navbar */}
+        <div className="flex flex-col items-center w-full z-10" style={{ transform: "translate(0.5vw, -6vh)" }}>
+          {/* 3. Welcome label + Main Header */}
+          <div className="header">
+            <span className="welcome-label text-xs md:text-sm uppercase tracking-[0.3em] text-foreground/60 mb-2 select-none block">Welcome to</span>
+            <Link href="/sign-in" className="cursor-pointer">
+              <h1>ARGON AI</h1>
+            </Link>
+          </div>
 
-        {/* 4. Subhero description */}
-        <div className="hero-sub z-10 mt-3">
-          <p className="subhero-text text-foreground/90 max-w-3xl leading-relaxed select-none">
-            AI That Doesn&apos;t Just <span className="italic font-bold text-primary">Answer.</span>
-            <br />
-            It <span className="italic font-bold text-primary">Acts.</span>
-          </p>
-          <div className="w-full max-w-[600px] h-[150px] flex items-center justify-center relative">
-            <PulseBeams
-              beams={heroBeams}
-              width={600}
-              height={200}
-              baseColor="rgba(196, 30, 58, 0.12)"
-              accentColor="rgba(196, 30, 58, 0.3)"
-              gradientColors={{
-                start: "#c41e3a",
-                middle: "#ff4d6d",
-                end: "#c41e3a",
-              }}
-              className="w-full h-full"
-            >
-              <Link href="/sign-up" className="get-started-btn inline-flex items-center justify-center select-none z-20">
-                ✦ &nbsp; Get Started
-              </Link>
-            </PulseBeams>
+          {/* 4. Subhero description */}
+          <div className="hero-sub mt-3">
+            <div className="flex flex-col items-center gap-2">
+              <p className="subhero-text text-foreground/90 max-w-3xl leading-relaxed select-none">
+                AI That Doesn&apos;t Just <span className="italic font-bold text-primary">Answer.</span>
+                <br />
+                It <span className="italic font-bold text-primary">Acts.</span>
+              </p>
+              <span className="text-sm md:text-base font-sans text-muted-foreground/80 max-w-xl mx-auto tracking-wide select-none leading-relaxed px-4 block text-center font-medium">
+                Argon AI is an AI executive assistant that integrates with Gmail and Google Calendar to summarize emails, draft replies, manage schedules, and automate workflows .
+              </span>
+            </div>
+            <div className="w-full max-w-[600px] h-[110px] flex items-center justify-center relative" style={{ marginTop: "-30px" }}>
+              <PulseBeams
+                beams={heroBeams}
+                width={600}
+                height={160}
+                baseColor="rgba(196, 30, 58, 0.12)"
+                accentColor="rgba(196, 30, 58, 0.3)"
+                gradientColors={{
+                  start: "#c41e3a",
+                  middle: "#ff4d6d",
+                  end: "#c41e3a",
+                }}
+                className="w-full h-full"
+              >
+                <Link href="/sign-up" className="get-started-btn inline-flex items-center justify-center select-none z-20">
+                  ✦ &nbsp; Get Started
+                </Link>
+              </PulseBeams>
+            </div>
           </div>
         </div>
 
