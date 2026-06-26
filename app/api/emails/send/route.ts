@@ -21,7 +21,13 @@ export async function POST(req: Request) {
     const { to, subject, body, attachments = [], threadId } = await req.json();
 
     if (!to || !subject || !body) {
-      return NextResponse.json({ error: 'Missing required fields (to, subject, body)' }, { status: 400 });
+      return NextResponse.json({ error: 'Please enter a valid recipient email address' }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(to.trim())) {
+      return NextResponse.json({ error: 'Please enter a valid email address for the recipient' }, { status: 400 });
     }
 
     const tenantClient = corsair.withTenant(session.user.id);
@@ -44,8 +50,7 @@ export async function POST(req: Request) {
         `To: ${to}`,
         `Subject: ${subject}`,
         'MIME-Version: 1.0',
-        `Content-Type: multipart/mixed; boundary="${boundary}"`,
-        ''
+        `Content-Type: multipart/mixed; boundary="${boundary}"`
       ];
 
       const parts = [
@@ -75,7 +80,7 @@ export async function POST(req: Request) {
 
       parts.push(`--${boundary}--`);
 
-      rawMessage = emailHeaders.join('\r\n') + parts.join('\r\n');
+      rawMessage = emailHeaders.join('\r\n') + '\r\n\r\n' + parts.join('\r\n');
     }
 
     // Convert raw message to URL-safe base64 representation

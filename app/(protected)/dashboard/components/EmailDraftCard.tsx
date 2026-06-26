@@ -91,7 +91,7 @@ export function EmailDraftCard({
         body: JSON.stringify({ to, subject, body, attachments, threadId })
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setStatus('sent');
         addToolResult({
           tool: 'draft_email' as any,
@@ -99,7 +99,8 @@ export function EmailDraftCard({
           output: { success: true, message: 'Email sent successfully' }
         });
       } else {
-        throw new Error(data.error || 'Failed to send email');
+        const msg = data.error || (res.status === 400 ? 'Please enter a valid recipient email address' : 'Failed to send email');
+        throw new Error(msg);
       }
     } catch (err: any) {
       setErrorMessage(cleanErrorMessage(err.message || 'Failed to send email'));
