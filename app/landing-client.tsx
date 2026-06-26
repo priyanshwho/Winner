@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const heroBeams = [
   {
-    path: "M 0,100 L 220,100",
+    path: "M 0,80 L 220,80",
     gradientConfig: {
       initial: { x1: "0%", x2: "0%", y1: "50%", y2: "50%" },
       animate: { x1: ["0%", "100%"], x2: ["10%", "110%"], y1: ["50%", "50%"], y2: ["50%", "50%"] },
@@ -27,7 +27,7 @@ const heroBeams = [
     }
   },
   {
-    path: "M 600,100 L 380,100",
+    path: "M 600,80 L 380,80",
     gradientConfig: {
       initial: { x1: "100%", x2: "100%", y1: "50%", y2: "50%" },
       animate: { x1: ["100%", "0%"], x2: ["90%", "-10%"], y1: ["50%", "50%"], y2: ["50%", "50%"] },
@@ -35,7 +35,7 @@ const heroBeams = [
     }
   },
   {
-    path: "M 100,0 C 100,50 150,100 220,100",
+    path: "M 100,0 C 100,40 150,80 220,80",
     gradientConfig: {
       initial: { x1: "0%", x2: "0%", y1: "0%", y2: "0%" },
       animate: { x1: ["0%", "100%"], x2: ["10%", "110%"], y1: ["0%", "50%"], y2: ["0%", "50%"] },
@@ -43,7 +43,7 @@ const heroBeams = [
     }
   },
   {
-    path: "M 500,200 C 500,150 450,100 380,100",
+    path: "M 500,160 C 500,120 450,80 380,80",
     gradientConfig: {
       initial: { x1: "100%", x2: "100%", y1: "100%", y2: "100%" },
       animate: { x1: ["100%", "0%"], x2: ["90%", "-10%"], y1: ["100%", "50%"], y2: ["100%", "50%"] },
@@ -402,22 +402,22 @@ export default function LandingClient() {
       <div className="preloader">
         <div className="preloader-images">
           <div className="preloader-img">
-            <img src="/Yuya_M (@yuyar33) on X.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/Blood Moon _ Metal Poster by Yagedan - (Displate).jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
           <div className="preloader-img">
-            <img src="/Fushimi Inari.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/Post by @claumarrtins · 10 images.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
           <div className="preloader-img">
-            <img src="/Fushimi Inari Taisha,  Kyoto.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/_.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
           <div className="preloader-img">
-            <img src="/Fuji, Japan.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/Red Pillar and Flowered Parasol.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
           <div className="preloader-img">
-            <img src="/_ (4).jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/_ (1).jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
           <div className="preloader-img">
-            <img src="/_ (3).jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
+            <img src="/argon-load/Red Astronaut in Roses - 4K Wallpaper.jpeg" alt="" className="shadow-[0_15px_40px_rgba(0,0,0,0.6)] dark:shadow-[0_15px_40px_rgba(255,255,255,0.15)] rounded-xl" />
           </div>
         </div>
 
@@ -490,7 +490,7 @@ export default function LandingClient() {
           className="absolute inset-0 z-0 bg-no-repeat bg-cover opacity-[0.3] dark:opacity-[1] pointer-events-none blur-md dark:blur-none"
           style={{ 
             backgroundImage: "url('/HERO-BGMM.png')",
-            backgroundPosition: "35% center",
+            backgroundPosition: "50% center",
           }}
         />
 
@@ -498,32 +498,32 @@ export default function LandingClient() {
         <div className="absolute inset-0 z-2 pointer-events-none">
           <ImageTrail containerRef={containerRef as any}>
             <img
-              src="/Yuya_M (@yuyar33) on X.jpeg"
+              src="/argon-load/Blood Moon _ Metal Poster by Yagedan - (Displate).jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
             <img
-              src="/Fushimi Inari.jpeg"
+              src="/argon-load/Post by @claumarrtins · 10 images.jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
             <img
-              src="/Fushimi Inari Taisha,  Kyoto.jpeg"
+              src="/argon-load/Red Astronaut in Roses - 4K Wallpaper.jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
             <img
-              src="/Fuji, Japan.jpeg"
+              src="/argon-load/Red Pillar and Flowered Parasol.jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
             <img
-              src="/_ (4).jpeg"
+              src="/argon-load/_ (1).jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
             <img
-              src="/_ (3).jpeg"
+              src="/argon-load/_.jpeg"
               alt=""
               className="w-[50px] h-[60px] object-cover rounded-md border border-[#e0e2db]/20 shadow-[0_15px_35px_rgba(0,0,0,0.5)] dark:shadow-[0_15px_35px_rgba(255,255,255,0.15)] dark:border-[#141414]/20"
             />
@@ -540,16 +540,21 @@ export default function LandingClient() {
 
         {/* 4. Subhero description */}
         <div className="hero-sub z-10 mt-3">
-          <p className="subhero-text text-foreground/90 max-w-3xl leading-relaxed select-none">
-            AI That Doesn&apos;t Just <span className="italic font-bold text-primary">Answer.</span>
-            <br />
-            It <span className="italic font-bold text-primary">Acts.</span>
-          </p>
-          <div className="w-full max-w-[600px] h-[150px] flex items-center justify-center relative">
+          <div className="flex flex-col items-center gap-2">
+            <p className="subhero-text text-foreground/90 max-w-3xl leading-relaxed select-none">
+              AI That Doesn&apos;t Just <span className="italic font-bold text-primary">Answer.</span>
+              <br />
+              It <span className="italic font-bold text-primary">Acts.</span>
+            </p>
+            <span className="text-xs md:text-sm font-sans text-muted-foreground/80 max-w-lg mx-auto tracking-wide select-none leading-relaxed px-4 block text-center">
+              Argon AI is an AI executive assistant that integrates with Gmail and Google Calendar to summarize emails, draft replies, manage schedules, and automate workflows.
+            </span>
+          </div>
+          <div className="w-full max-w-[600px] h-[110px] flex items-center justify-center relative" style={{ marginTop: "-30px" }}>
             <PulseBeams
               beams={heroBeams}
               width={600}
-              height={200}
+              height={160}
               baseColor="rgba(196, 30, 58, 0.12)"
               accentColor="rgba(196, 30, 58, 0.3)"
               gradientColors={{
