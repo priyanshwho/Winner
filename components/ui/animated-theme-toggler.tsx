@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useCallback } from "react"
+import { useRef, useCallback } from "react"
 import { flushSync } from "react-dom"
 import { Moon, Sun } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,10 +15,9 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
   const buttonRef = useRef<HTMLButtonElement>(null)
   const { resolvedTheme, setTheme } = useTheme()
   const darkMode = resolvedTheme === "dark"
-
   const transitioningRef = useRef(false)
 
-  const onToggle = useCallback(() => {
+  const onToggle = useCallback(async () => {
     if (!buttonRef.current || transitioningRef.current) return
 
     const toggled = !darkMode
@@ -38,22 +37,35 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
       Math.max(centerY, window.innerHeight - centerY)
     )
 
-    document.documentElement.style.setProperty("--theme-toggle-x", `${centerX}px`)
-    document.documentElement.style.setProperty("--theme-toggle-y", `${centerY}px`)
-    document.documentElement.style.setProperty("--theme-toggle-r", `${maxDistance}px`)
-
     const transition = document.startViewTransition(() => {
       flushSync(() => {
         setTheme(toggled ? "dark" : "light")
       })
     })
 
-    transition.ready.catch(() => {})
-    transition.finished.then(() => {
+    try {
+      await transition.ready
+
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${centerX}px ${centerY}px)`,
+            `circle(${maxDistance}px at ${centerX}px ${centerY}px)`,
+          ],
+        },
+        {
+          duration: 700,
+          easing: "ease-in-out",
+          pseudoElement: "::view-transition-new(root)",
+        }
+      )
+
+      await transition.finished
+    } catch {
+      // Transition was aborted by a new one — safe to ignore
+    } finally {
       transitioningRef.current = false
-    }).catch(() => {
-      transitioningRef.current = false
-    })
+    }
   }, [darkMode, setTheme])
 
   return (
@@ -97,10 +109,9 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
 // Hook to trigger the same animation from anywhere (e.g., double-tap)
 export function useAnimatedThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-
   const transitioningRef = useRef(false)
 
-  const toggle = useCallback((originX?: number, originY?: number) => {
+  const toggle = useCallback(async (originX?: number, originY?: number) => {
     if (transitioningRef.current) return
     const toggled = resolvedTheme !== "dark"
 
@@ -118,22 +129,35 @@ export function useAnimatedThemeToggle() {
       Math.max(cy, window.innerHeight - cy)
     )
 
-    document.documentElement.style.setProperty("--theme-toggle-x", `${cx}px`)
-    document.documentElement.style.setProperty("--theme-toggle-y", `${cy}px`)
-    document.documentElement.style.setProperty("--theme-toggle-r", `${maxDistance}px`)
-
     const transition = document.startViewTransition(() => {
       flushSync(() => {
         setTheme(toggled ? "dark" : "light")
       })
     })
 
-    transition.ready.catch(() => {})
-    transition.finished.then(() => {
+    try {
+      await transition.ready
+
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${cx}px ${cy}px)`,
+            `circle(${maxDistance}px at ${cx}px ${cy}px)`,
+          ],
+        },
+        {
+          duration: 700,
+          easing: "ease-in-out",
+          pseudoElement: "::view-transition-new(root)",
+        }
+      )
+
+      await transition.finished
+    } catch {
+      // Transition was aborted — safe to ignore
+    } finally {
       transitioningRef.current = false
-    }).catch(() => {
-      transitioningRef.current = false
-    })
+    }
   }, [resolvedTheme, setTheme])
 
   return toggle

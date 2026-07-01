@@ -391,6 +391,11 @@ export default function LandingClient() {
       }
 
       setActiveSection(currentSection);
+      // Keep URL hash in sync with scroll position
+      const newHash = currentSection ? `#${currentSection}` : window.location.pathname;
+      if (window.location.hash !== (currentSection ? `#${currentSection}` : "")) {
+        history.replaceState(null, "", newHash);
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -401,6 +406,8 @@ export default function LandingClient() {
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
+    // Update URL hash without triggering a page jump
+    history.pushState(null, "", `#${id}`);
     const element = document.getElementById(id);
     if (element) {
       const wrapper = element.closest(".section-stack-wrapper") || element;
@@ -411,6 +418,35 @@ export default function LandingClient() {
       });
     }
   };
+
+  // Handle /#section hash links (from footer or direct URL)
+  useEffect(() => {
+    const scrollToHash = (hash: string) => {
+      const id = hash.replace("#", "");
+      if (!id) return;
+      // Wait for layout to be ready
+      requestAnimationFrame(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          const wrapper = element.closest(".section-stack-wrapper") || element;
+          const targetY = getStaticOffsetTop(wrapper as HTMLElement);
+          window.scrollTo({ top: targetY, behavior: "smooth" });
+          setActiveSection(id);
+        }
+      });
+    };
+
+    // On initial load, scroll to hash if present
+    if (window.location.hash) {
+      // Slight delay so the page is rendered first
+      setTimeout(() => scrollToHash(window.location.hash), 300);
+    }
+
+    // Listen for hash changes (e.g. clicking footer links)
+    const onHashChange = () => scrollToHash(window.location.hash);
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   return (
     <div ref={containerRef} className={`landing-page-container ${isLoaded ? "loaded" : ""}`}>

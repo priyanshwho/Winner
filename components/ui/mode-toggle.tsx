@@ -9,7 +9,7 @@ export function ModeToggle() {
   const { setTheme, resolvedTheme } = useTheme()
   const transitioningRef = useRef(false)
 
-  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleTheme = async (event: React.MouseEvent<HTMLButtonElement>) => {
     if (transitioningRef.current) return
     const toggled = resolvedTheme !== "dark"
 
@@ -28,22 +28,35 @@ export function ModeToggle() {
       Math.max(cy, window.innerHeight - cy)
     )
 
-    document.documentElement.style.setProperty("--theme-toggle-x", `${cx}px`)
-    document.documentElement.style.setProperty("--theme-toggle-y", `${cy}px`)
-    document.documentElement.style.setProperty("--theme-toggle-r", `${maxDistance}px`)
-
     const transition = document.startViewTransition(() => {
       flushSync(() => {
         setTheme(toggled ? "dark" : "light")
       })
     })
 
-    transition.ready.catch(() => {})
-    transition.finished.then(() => {
+    try {
+      await transition.ready
+
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${cx}px ${cy}px)`,
+            `circle(${maxDistance}px at ${cx}px ${cy}px)`,
+          ],
+        },
+        {
+          duration: 700,
+          easing: "ease-in-out",
+          pseudoElement: "::view-transition-new(root)",
+        }
+      )
+
+      await transition.finished
+    } catch {
+      // Aborted by a rapid re-click — safe to ignore
+    } finally {
       transitioningRef.current = false
-    }).catch(() => {
-      transitioningRef.current = false
-    })
+    }
   }
 
   return (
