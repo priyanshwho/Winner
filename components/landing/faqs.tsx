@@ -66,7 +66,6 @@ export default function FAQs() {
 
   return (
     <section 
-      id="faqs" 
       ref={sectionRef}
       className="min-h-screen flex flex-col justify-center py-10 md:py-12 border-t border-border bg-background text-foreground relative overflow-hidden"
     >

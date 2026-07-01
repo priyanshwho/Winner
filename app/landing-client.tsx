@@ -387,9 +387,11 @@ export default function LandingClient() {
     setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+      const wrapper = element.closest(".section-stack-wrapper") || element;
+      const targetY = (wrapper as HTMLElement).offsetTop;
+      window.scrollTo({
+        top: targetY,
+        behavior: "smooth"
       });
     }
   };
@@ -430,10 +432,19 @@ export default function LandingClient() {
       {/* Navigation */}
       <nav className="font-serif flex items-center justify-between z-50 text-black dark:text-foreground transition-all duration-300">
         <div className="nav-logo flex items-center select-none">
-          <Link href="/" className="flex items-center">
+          <button
+            onClick={() => {
+              setActiveSection("");
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+              });
+            }}
+            className="flex items-center cursor-pointer bg-transparent border-none p-0"
+          >
             <img src="/BL-ARGON.png" alt="ARGON AI" className="dark:hidden w-auto transition-all duration-300 h-20 md:h-24" />
             <img src="/WL-ARGON.png" alt="ARGON AI" className="hidden dark:block w-auto transition-all duration-300 h-20 md:h-24" />
-          </Link>
+          </button>
         </div>
 
         {/* Center scrolling links */}
