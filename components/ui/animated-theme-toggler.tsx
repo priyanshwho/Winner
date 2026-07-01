@@ -16,7 +16,7 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
   const { resolvedTheme, setTheme } = useTheme()
   const darkMode = resolvedTheme === "dark"
 
-  const onToggle = useCallback(async () => {
+  const onToggle = useCallback(() => {
     if (!buttonRef.current) return
 
     const toggled = !darkMode
@@ -34,27 +34,15 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
       Math.max(centerY, window.innerHeight - centerY)
     )
 
-    const transition = document.startViewTransition(() => {
+    document.documentElement.style.setProperty("--theme-toggle-x", `${centerX}px`)
+    document.documentElement.style.setProperty("--theme-toggle-y", `${centerY}px`)
+    document.documentElement.style.setProperty("--theme-toggle-r", `${maxDistance}px`)
+
+    document.startViewTransition(() => {
       flushSync(() => {
         setTheme(toggled ? "dark" : "light")
       })
     })
-
-    await transition.ready
-
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${centerX}px ${centerY}px)`,
-          `circle(${maxDistance}px at ${centerX}px ${centerY}px)`,
-        ],
-      },
-      {
-        duration: 700,
-        easing: "ease-in-out",
-        pseudoElement: "::view-transition-new(root)",
-      }
-    )
   }, [darkMode, setTheme])
 
   return (
@@ -99,7 +87,7 @@ export const AnimatedThemeToggler = ({ className }: AnimatedThemeTogglerProps) =
 export function useAnimatedThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
 
-  const toggle = useCallback(async (originX?: number, originY?: number) => {
+  const toggle = useCallback((originX?: number, originY?: number) => {
     const toggled = resolvedTheme !== "dark"
 
     if (!document.startViewTransition) {
@@ -114,27 +102,15 @@ export function useAnimatedThemeToggle() {
       Math.max(cy, window.innerHeight - cy)
     )
 
-    const transition = document.startViewTransition(() => {
+    document.documentElement.style.setProperty("--theme-toggle-x", `${cx}px`)
+    document.documentElement.style.setProperty("--theme-toggle-y", `${cy}px`)
+    document.documentElement.style.setProperty("--theme-toggle-r", `${maxDistance}px`)
+
+    document.startViewTransition(() => {
       flushSync(() => {
         setTheme(toggled ? "dark" : "light")
       })
     })
-
-    await transition.ready
-
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${cx}px ${cy}px)`,
-          `circle(${maxDistance}px at ${cx}px ${cy}px)`,
-        ],
-      },
-      {
-        duration: 700,
-        easing: "ease-in-out",
-        pseudoElement: "::view-transition-new(root)",
-      }
-    )
   }, [resolvedTheme, setTheme])
 
   return toggle
